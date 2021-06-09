@@ -45,6 +45,7 @@ s=0
 shootFlag=True
 moveFlag=False
 keyFlag=True
+FLAG=True
 
 #Texto de la  ventana de información adicional
 about="""
@@ -102,23 +103,22 @@ class Meteor:
         def movimiento():
             x0 = self.canvas.coords(meteor)[0]
             y0 = self.canvas.coords(meteor)[1]
-            speed_x = 5
-            speed_y = 5
-            while True:
+            speed_x = 1
+            speed_y = 1
+            while FLAG:
                 self.canvas.move('meteor', speed_x, speed_y)
-                self.canvas.after(30)
-                self.canvas.update()
-                if x0 >= 600:
-                    speed_x = -5
+                sleep(0.007)
+                if x0 >= 500:
+                    speed_x = -1
                 if x0 <= 0:
-                    speed_x = 5
-                if y0 >= 800:
-                    speed_y = -5
+                    speed_x = 1
+                if y0 >= 700:
+                    speed_y = -1
                 if y0 <= 0:
-                    speed_y = 5
+                    speed_y = 1
                 x0 += speed_x
                 y0 += speed_y
-        movimiento()
+        Thread(target=movimiento, args=()).start()
            
 class Niveles:
     music=""
@@ -128,6 +128,7 @@ class Niveles:
         self.fondo=fondo
     
     def basico(self):
+        global FLAG
         FLAG=True
         pts=0
         life=50
@@ -139,8 +140,9 @@ class Niveles:
         reprod_cancion(self.music)
 
         def end(): #función que calcula los bonuses en caso de finalizar, no hay bonuses en cierres forzados
-            global ventana, h, m, s
+            global ventana, h, m, s, FLAG
             nonlocal pts, nombre, life
+            FLAG=False
             if life==50: #si la vida es 50 entonces se obtiene +10 bonus
                 pts+=10
             if h==0 and m==0 and s<=30: #si lo hizo en 30 segs +20 bonus
@@ -153,8 +155,9 @@ class Niveles:
             reprod_cancion("assets\\title.mp3")
 
         def back(): #función del botón BACK
-            global ventana
+            global ventana, FLAG
             nonlocal pts, nombre
+            FLAG=False
             reset_time()
             checkPoints(pts, nombre, 0)
             detener_cancion()
@@ -163,8 +166,8 @@ class Niveles:
             reprod_cancion("assets\\title.mp3")
 
         def close(): #función de cierre
-            nonlocal nivel1, FLAG
-            global ventana
+            nonlocal nivel1
+            global ventana, FLAG
             FLAG=False #da la señal para detener animación
             detener_cancion()
             reproducir_salida() #reproduce efecto de salida
