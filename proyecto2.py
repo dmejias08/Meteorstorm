@@ -94,19 +94,23 @@ ventana.resizable(width=NO, height=NO)
 
 class Meteor:
     canvas=0
-    def __init__(self, canvas):
+    def __init__(self, canvas, imagen):
         self.canvas=canvas
+        self.imagen=imagen
     
     def obstaculo(self):
-        self.canvas.meteor=cargar_img("meteor.png")
-        meteor = self.canvas.create_image(randint(50,450),randint(100,650),anchor=NW, image=self.canvas.meteor, tags="meteor")#crea al boss
-        def movimiento():
+        def create_space(canva,imagen) : #crea un meteor
+            space = canva.create_image(randint(50,450),randint(100,650),anchor=NW, image=imagen, tags="meteorito")
+            return space
+        def movimiento(meteor):
             x0 = self.canvas.coords(meteor)[0]
             y0 = self.canvas.coords(meteor)[1]
+            print(x0)
+            print(y0)
             speed_x = 1
             speed_y = 1
             while FLAG:
-                self.canvas.move('meteor', speed_x, speed_y)
+                self.canvas.move(meteor, speed_x, speed_y)
                 sleep(0.007)
                 if x0 >= 500:
                     speed_x = -1
@@ -118,14 +122,16 @@ class Meteor:
                     speed_y = 1
                 x0 += speed_x
                 y0 += speed_y
-        Thread(target=movimiento, args=()).start()
+        Thread(target=movimiento, args=(create_space(self.canvas, self.imagen),)).start()
            
 class Niveles:
     music=""
     fondo=""
-    def __init__(self,music,fondo):
+    canvas=0
+    def __init__(self,music,fondo,canvas=0):
         self.music=music
         self.fondo=fondo
+        self.canvas=canvas
     
     def basico(self):
         global FLAG
@@ -177,6 +183,7 @@ class Niveles:
 
         #Creación canvas del nivel1 
         C_nivel1=Canvas(nivel1, width=600, height=800)
+        self.canvas=C_nivel1
         C_nivel1.place(x=0,y=0)
 
         #Asiganción fondo subventana
@@ -296,22 +303,27 @@ class Niveles:
         #eventos de press y release 
         nivel1.bind('<KeyPress>', move_ship)
         nivel1.bind('<KeyRelease>', stop_shoot)
-        Meteor1=Meteor(C_nivel1)
-        Meteor1.obstaculo()
         #cierre protocolo
         nivel1.protocol("WM_DELETE_WINDOW",close)
     
 class Nivel1(Niveles):
-    def __init__(self,music,fondo):
-        Niveles.__init__(self,music,fondo)
+    def __init__(self,music,fondo,canvas=0):
+        Niveles.__init__(self,music,fondo,canvas)
+
+    def create_meteor(self):
+        self.canvas.meteorito=cargar_img("meteor.png")
+        meteors=[Meteor(self.canvas,self.canvas.meteorito),Meteor(self.canvas,self.canvas.meteorito),Meteor(self.canvas,self.canvas.meteorito),Meteor(self.canvas,self.canvas.meteorito),Meteor(self.canvas,self.canvas.meteorito)]
+        for i in meteors:
+            i.obstaculo()
+        
 
 class Nivel2(Niveles):
-    def __init__(self,music,fondo):
-        Niveles.__init__(self,music,fondo)
+    def __init__(self,music,fondo,canvas=0):
+        Niveles.__init__(self,music,fondo,canvas)
 
 class Nivel3(Niveles):
-    def __init__(self,music,fondo):
-        Niveles.__init__(self,music,fondo)
+    def __init__(self,music,fondo,canvas=0):
+        Niveles.__init__(self,music,fondo,canvas)
 
 ##############################################################################################################
                                              # Pantalla Principal #
@@ -379,6 +391,7 @@ def Vnivel1Check(): #check del box de nombre que no esté vacío y corre nivel 1
     else:
         Nivel01=Nivel1("assets\\nivel1.mp3","fondo1.png")
         Nivel01.basico()
+        Nivel01.create_meteor()
 
 def Vnivel2Check(): #check del box de nombre que no esté vacío y corre nivel 2
     if entry_text.get()=="":
