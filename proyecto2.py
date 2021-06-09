@@ -105,10 +105,8 @@ class Meteor:
         def movimiento(meteor):
             x0 = self.canvas.coords(meteor)[0]
             y0 = self.canvas.coords(meteor)[1]
-            print(x0)
-            print(y0)
-            speed_x = 1
-            speed_y = 1
+            speed_x = choice([1,-1])
+            speed_y = choice([1,-1])
             while FLAG:
                 self.canvas.move(meteor, speed_x, speed_y)
                 sleep(0.007)
