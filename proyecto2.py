@@ -141,6 +141,7 @@ class Niveles:
     def basico(self):
         global FLAG, meteors
         FLAG=True
+        sprFlag=True
         pts=0
         life=50
         ventana.withdraw() #oculta ventana principal
@@ -171,6 +172,7 @@ class Niveles:
             FLAG=False
             reset_time()
             checkPoints(pts, nombre, 0)
+            sleep(0.5)
             detener_cancion()
             ventana.deiconify() #reaparece la ventana principal
             nivel1.destroy() #cierra la subventana nivel1
@@ -213,6 +215,8 @@ class Niveles:
         Label_time=Label(C_nivel1, font=fnt3, bg="#850458", fg="#ffffff")
         Label_time.place(x=600,y=50,anchor=NE)
         cronom(Label_time)#llamada al cronómetro
+
+        C_nivel1.damage=cargar_img("damage1.png")
                 
         def colision(x1,y1,w1,h1,x2,y2,w2,h2): #verifica colisiones mediante comparaciones de rangos en un área coordenadas, ancho y alto
             if x1>x2+w2 or x1+w1<x2 or y1>y2+h2 or y1+h1<y2:
@@ -237,12 +241,17 @@ class Niveles:
                 return cargarVarios(list_img[1:], listaResultado) # llamada recursiva 
 
         def moverSprite(i, id, lista):
+            nonlocal sprFlag
             if i == 6 : #condición para continuar con la secuencia de imagenes 
                 i = 0
-            C_nivel1.itemconfig(id, image = lista[i]) #cambiar las imagenes dentro del canvas y en elemento imagen
             def callback():  #funcion recursiva
                 moverSprite(i+1, id, lista)
-            C_nivel1.after(100,callback)   #llamada recursiva
+            if sprFlag:
+                C_nivel1.itemconfig(id, image = lista[i]) #cambiar las imagenes dentro del canvas y en elemento imagen
+                C_nivel1.after(100,callback)   #llamada recursiva
+            else:
+                C_nivel1.itemconfig(id, image = C_nivel1.damage)
+                C_nivel1.after(500,callback)   #llamada recursiva 
 
         #carga el ship y el ship dañado y los agrega a una lista
         ship=C_nivel1.create_image(300,700,anchor=NW, tags="ship")
@@ -251,15 +260,20 @@ class Niveles:
         C_nivel1.laser=cargar_img("laser.png")
 
         def coll_ship():
-            nonlocal C_nivel1, shipco, life, Label_nombre, nombre
+            nonlocal C_nivel1, shipco, life, Label_nombre, nombre, sprFlag
             global meteors
             shipco=C_nivel1.coords(ship) #coordenadas en tiempo real
             for j in meteors:
                 bossco=C_nivel1.coords(j.id)
                 if colision(shipco[0],shipco[1],50,89,bossco[0],bossco[1],100,100): #verifica colisión
-                    reprod_fx("hit2.mp3") #sonido de daño
+                    reprod_fx("bigfire.mp3") #sonido de daño
                     life-=1
                     Label_life["text"]=nombre+"'s life: "+str(life)+" pts"
+                    sprFlag=False #cambia a nave dañada
+                    def normal(): #vuelve a nave normal después de medio segundo
+                        nonlocal C_nivel1,sprFlag
+                        sprFlag=True
+                    C_nivel1.after(500,normal)
                     C_nivel1.delete(j.id)
                     meteors.remove(j)
             def callback():
