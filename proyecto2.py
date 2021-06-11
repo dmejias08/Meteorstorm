@@ -46,6 +46,7 @@ shootFlag=True
 moveFlag=False
 keyFlag=True
 FLAG=True
+meteors=[]
 
 #Texto de la  ventana de información adicional
 about="""
@@ -60,6 +61,7 @@ Geovanny García Downing
 #Listas que contienen puntajes y nombres del top 5 puntajes
 puntajes=[]
 nombres=[]
+shipco=[]
 
 def guardar_archivo(archivo, i=0): #Función para guardar archivo de texto
     global nombres, puntajes
@@ -93,21 +95,26 @@ ventana.resizable(width=NO, height=NO)
 ##############################################################################################################
 
 class Meteor:
-    canvas=0
-    def __init__(self, canvas, imagen):
+    def __init__(self, canvas, imagen, id):
         self.canvas=canvas
         self.imagen=imagen
-    
+        self.id=id
+    def getCoords(self):
+        print(self.coordi)
+
     def obstaculo(self):
         def create_space(canva,imagen) : #crea un meteor
             space = canva.create_image(randint(50,450),randint(100,650),anchor=NW, image=imagen, tags="meteorito")
+            self.id=space
             return space
         def movimiento(meteor):
+            global shipco
             x0 = self.canvas.coords(meteor)[0]
             y0 = self.canvas.coords(meteor)[1]
             speed_x = choice([1,-1])
             speed_y = choice([1,-1])
             while FLAG:
+                self.coordi=self.canvas.coords(meteor)
                 self.canvas.move(meteor, speed_x, speed_y)
                 sleep(0.007)
                 if x0 >= 500:
@@ -130,9 +137,9 @@ class Niveles:
         self.music=music
         self.fondo=fondo
         self.canvas=canvas
-    
+
     def basico(self):
-        global FLAG
+        global FLAG, meteors
         FLAG=True
         pts=0
         life=50
@@ -241,25 +248,33 @@ class Niveles:
         ship=C_nivel1.create_image(300,750,anchor=NW, tags="ship")
         shipco=C_nivel1.coords(ship)
         animar(ship,"tile*.png")
-        """
+        C_nivel1.laser=cargar_img("laser.png")
+
         def laser_mov(i,objeto,collFlag=True): #mueve el laser
             nonlocal C_nivel1, shipco, pts, Label_nombre, nombre
+            global meteors
             lasco=C_nivel1.coords(objeto) #coordenadas en tiempo real
-            if colision(lasco[0],lasco[1],50,89,bossco[0],bossco[1],175,175) and collFlag and bolife>0: #verifica colisión
-                collFlag=False
-                reprod_fx("hit2.mp3") #sonido de daño
-                pts+=1
-                Label_nombre["text"]=nombre+"'s score: "+str(pts)+" pts"
+            for j in meteors:
+                bossco=C_nivel1.coords(j.id)
+                if colision(lasco[0],lasco[1],50,89,bossco[0],bossco[1],100,100) and collFlag: #verifica colisión
+                    collFlag=False
+                    reprod_fx("hit2.mp3") #sonido de daño
+                    pts+=1
+                    Label_nombre["text"]=nombre+"'s score: "+str(pts)+" pts"
+                    C_nivel1.delete(j.id)
+                    meteors.remove(j)
+                    C_nivel1.delete(objeto)
+                    return
             if lasco[1]>-100:
                 C_nivel1.move(objeto,0,i)
                 def callback():
                     laser_mov(i-0.1 ,objeto,collFlag)
                 C_nivel1.after(5 , callback)
-            """       
+                   
         def smooth_mov(objeto,i,j): #cree este algoritmo para que el movimiento de la nave fuera más suave
-            global moveFlag #bandera, produce movimiento hasta keyrelease
-            m=C_nivel1.coords(objeto)
-            if ((i==-1 and 550>m[0]) or (i==1 and m[0]>50) or (j==-1 and 751>m[1]) or (j==1 and m[1]>100)) and moveFlag:
+            global moveFlag, shipco #bandera, produce movimiento hasta keyrelease
+            shipco=C_nivel1.coords(objeto)
+            if ((i==-1 and 550>shipco[0]) or (i==1 and shipco[0]>50) or (j==-1 and 751>shipco[1]) or (j==1 and shipco[1]>100)) and moveFlag:
                 C_nivel1.move(objeto,-i,-j)
                 def callback():
                     smooth_mov(objeto,i,j)
@@ -267,8 +282,8 @@ class Niveles:
 
         def create_laser(canva,imagen) : #crea un laser cada vez que se dispara
             reprod_fx("metal.mp3") #sonido de disparo
-            laser = canva.create_image(shipco[0],shipco[1],anchor="center", image=imagen)
-            return #laser_mov(0,laser)
+            laser = canva.create_image(shipco[0]+50,shipco[1],anchor="center", image=imagen)
+            return laser_mov(0,laser)
 
         def move_ship(evento):  #verifica lo que toca el usuario en el teclado
             nonlocal C_nivel1, shipco, ship
@@ -287,7 +302,7 @@ class Niveles:
             elif evento.keysym=="space":
                 if shootFlag:
                     shipco=C_nivel1.coords(ship)
-                    #create_laser(C_nivel1,C_nivel1.laser)
+                    create_laser(C_nivel1,C_nivel1.laser)
                     shootFlag=False #bloquea disparo presionado
 
         def stop_shoot(evento):
@@ -303,18 +318,14 @@ class Niveles:
         nivel1.bind('<KeyRelease>', stop_shoot)
         #cierre protocolo
         nivel1.protocol("WM_DELETE_WINDOW",close)
-    
+"""    
 class Nivel1(Niveles):
     def __init__(self,music,fondo,canvas=0):
         Niveles.__init__(self,music,fondo,canvas)
 
     def create_meteor(self):
-        self.canvas.meteorito=cargar_img("meteor.png")
-        meteors=[Meteor(self.canvas,self.canvas.meteorito),Meteor(self.canvas,self.canvas.meteorito),Meteor(self.canvas,self.canvas.meteorito),Meteor(self.canvas,self.canvas.meteorito),Meteor(self.canvas,self.canvas.meteorito)]
-        for i in meteors:
-            i.obstaculo()
+        pass
         
-
 class Nivel2(Niveles):
     def __init__(self,music,fondo,canvas=0):
         Niveles.__init__(self,music,fondo,canvas)
@@ -322,7 +333,7 @@ class Nivel2(Niveles):
 class Nivel3(Niveles):
     def __init__(self,music,fondo,canvas=0):
         Niveles.__init__(self,music,fondo,canvas)
-
+"""
 ##############################################################################################################
                                              # Pantalla Principal #
 ##############################################################################################################
@@ -381,15 +392,22 @@ def limitador(entry_text): #limita el texto a 12 caracteres
 entry_text.trace("w", lambda *args: limitador(entry_text))
 
 def Vnivel1Check(): #check del box de nombre que no esté vacío y corre nivel 1
+    global meteors
     if entry_text.get()=="":
         msgbox=Toplevel()
         msgbox.minsize(200,200)
         L_saludo=Label(msgbox,text="Debe ingresar un nombre",font=fnt2)
         L_saludo.place(x=100, y=100, anchor="center")
     else:
-        Nivel01=Nivel1("assets\\nivel1.mp3","fondo1.png")
+        Nivel01=Niveles("assets\\nivel1.mp3","fondo1.png")
         Nivel01.basico()
-        Nivel01.create_meteor()
+        Nivel01.canvas.meteorito=cargar_img("meteor.png")
+        im=Nivel01.canvas.meteorito
+        ca=Nivel01.canvas
+        meteors=[Meteor(ca,im,0),Meteor(ca,im,0),Meteor(ca,im,0),Meteor(ca,im,0),Meteor(ca,im,0)]
+        for i in meteors:
+            i.obstaculo()
+        
 
 def Vnivel2Check(): #check del box de nombre que no esté vacío y corre nivel 2
     if entry_text.get()=="":
