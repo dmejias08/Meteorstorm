@@ -224,12 +224,16 @@ class Niveles:
             else:
                 return True
         
-        def animar(id, patron):
-            imagen = cargarSprites(patron)
+        def animar(id, patron,ruta):
+            imagen = cargarSprites(patron,ruta)
             Thread(target = moverSprite, args=(0, id, imagen)).start()
 
-        def cargarSprites(patron): #cargar las imagenes que forman la animacion
-            frame_ruta = glob.glob('assets/sprite/'+ patron) #ruta de frame 
+        def animar_exp(id, patron,ruta):
+            imagen = cargarSprites(patron,ruta)
+            Thread(target = exp_anim, args=(0, id, imagen)).start()
+
+        def cargarSprites(patron,ruta): #cargar las imagenes que forman la animacion
+            frame_ruta = glob.glob(ruta+ patron) #ruta de frame 
             frame_ruta.sort() # ordenar las imagenes
             return cargarVarios(frame_ruta, []) #retormo de una lista con las rutas de frames
 
@@ -253,10 +257,19 @@ class Niveles:
                 C_nivel1.itemconfig(id, image = C_nivel1.damage)
                 C_nivel1.after(500,callback)   #llamada recursiva 
 
+        def exp_anim(i, id, lista):
+            if i == 33 : #condición para continuar con la secuencia de imagenes 
+                C_nivel1.delete(id)
+                return
+            def callback():  #funcion recursiva
+                exp_anim(i+1, id, lista)
+            C_nivel1.itemconfig(id, image = lista[i]) #cambiar las imagenes dentro del canvas y en elemento imagen
+            C_nivel1.after(25,callback)   #llamada recursiva
+
         #carga el ship y el ship dañado y los agrega a una lista
         ship=C_nivel1.create_image(300,700,anchor=NW, tags="ship")
         shipco=C_nivel1.coords(ship)
-        animar(ship,"tile*.png")
+        animar(ship,"tile*.png",'assets/sprite/')
         C_nivel1.laser=cargar_img("laser.png")
 
         def coll_ship():
@@ -291,6 +304,8 @@ class Niveles:
                     reprod_fx("explo4.mp3") #sonido de daño
                     pts+=1
                     Label_nombre["text"]=nombre+"'s score: "+str(pts)+" pts"
+                    exp=C_nivel1.create_image(bossco[0],bossco[1],anchor=NW, tags="exp")
+                    animar_exp(exp,"tile**.png","assets/explosion/")
                     C_nivel1.delete(j.id)
                     meteors.remove(j)
                     C_nivel1.delete(objeto)
