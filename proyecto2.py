@@ -142,8 +142,9 @@ class Niveles:
         global FLAG, meteors
         FLAG=True
         sprFlag=True
+        notdead=True
         pts=0
-        life=50
+        life=3
         ventana.withdraw() #oculta ventana principal
         nivel1=Toplevel() 
         nivel1.title("Nivel 1") 
@@ -155,12 +156,11 @@ class Niveles:
             global ventana, h, m, s, FLAG
             nonlocal pts, nombre, life
             FLAG=False
-            if life==50: #si la vida es 50 entonces se obtiene +10 bonus
-                pts+=10
-            if h==0 and m==0 and s<=30: #si lo hizo en 30 segs +20 bonus
-                pts+=20
+            if life==3 and h==0 and m==0 and s<=60: #si la vida es 50 entonces se obtiene +10 bonus
+                pts+=s
             reset_time()
             checkPoints(pts, nombre, 0)
+            sleep(0.5)
             detener_cancion()
             ventana.deiconify() #reaparece la ventana principal
             nivel1.destroy() #cierra la subventana nivel1
@@ -217,6 +217,28 @@ class Niveles:
         cronom(Label_time)#llamada al cronómetro
 
         C_nivel1.damage=cargar_img("damage1.png")
+
+        def checkBoss(): #checa que ni el boss ni el jugador estén muertos
+            nonlocal life, C_nivel1, life, Label_time, notdead
+            if life<=0 and notdead:
+                notdead=False
+                pause_time(Label_time) #pausa tiempo
+                reprod_fx("explo4.mp3") #reproduce explosión 
+                msgbox=Toplevel() #mensaje de juego finalizado
+                msgbox.minsize(600,600)
+                if life==0:
+                    L_saludo=Label(msgbox,text="JUEGO\nFINALIZADO\nPerdió",font=("Candara Light",30))
+                    L_saludo.place(x=300, y=300, anchor="center")
+                else:
+                    L_saludo=Label(msgbox,text="JUEGO\nFINALIZADO\nGanó",font=("Candara Light",30))
+                    L_saludo.place(x=300, y=300, anchor="center")
+                def fin(): #llama a la función end luego de 5 segundos
+                    nonlocal msgbox
+                    msgbox.destroy()
+                    end()
+                C_nivel1.after(5000,fin) 
+            else:
+                return
                 
         def colision(x1,y1,w1,h1,x2,y2,w2,h2): #verifica colisiones mediante comparaciones de rangos en un área coordenadas, ancho y alto
             if x1>x2+w2 or x1+w1<x2 or y1>y2+h2 or y1+h1<y2:
@@ -289,6 +311,7 @@ class Niveles:
                     C_nivel1.after(500,normal)
                     C_nivel1.delete(j.id)
                     meteors.remove(j)
+                    checkBoss()
             def callback():
                 coll_ship()
             C_nivel1.after(5 , callback)
@@ -367,22 +390,7 @@ class Niveles:
         nivel1.bind('<KeyRelease>', stop_shoot)
         #cierre protocolo
         nivel1.protocol("WM_DELETE_WINDOW",close)
-"""    
-class Nivel1(Niveles):
-    def __init__(self,music,fondo,canvas=0):
-        Niveles.__init__(self,music,fondo,canvas)
 
-    def create_meteor(self):
-        pass
-        
-class Nivel2(Niveles):
-    def __init__(self,music,fondo,canvas=0):
-        Niveles.__init__(self,music,fondo,canvas)
-
-class Nivel3(Niveles):
-    def __init__(self,music,fondo,canvas=0):
-        Niveles.__init__(self,music,fondo,canvas)
-"""
 ##############################################################################################################
                                              # Pantalla Principal #
 ##############################################################################################################
@@ -448,7 +456,8 @@ def Vnivel1Check(): #check del box de nombre que no esté vacío y corre nivel 1
         L_saludo=Label(msgbox,text="Debe ingresar un nombre",font=fnt2)
         L_saludo.place(x=100, y=100, anchor="center")
     else:
-        Nivel01=Niveles("assets\\nivel1.mp3","fondo1.png")
+        Nivel01=Niveles("assets\\nivel1.mp3",
+        )
         Nivel01.basico()
         Nivel01.canvas.meteorito=cargar_img("meteor.png")
         im=Nivel01.canvas.meteorito
