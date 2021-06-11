@@ -265,7 +265,7 @@ class Niveles:
             shipco=C_nivel1.coords(ship) #coordenadas en tiempo real
             for j in meteors:
                 bossco=C_nivel1.coords(j.id)
-                if colision(shipco[0],shipco[1],50,89,bossco[0],bossco[1],100,100): #verifica colisión
+                if colision(shipco[0],shipco[1],100,100,bossco[0],bossco[1],100,100): #verifica colisión
                     reprod_fx("bigfire.mp3") #sonido de daño
                     life-=1
                     Label_life["text"]=nombre+"'s life: "+str(life)+" pts"
@@ -286,9 +286,9 @@ class Niveles:
             lasco=C_nivel1.coords(objeto) #coordenadas en tiempo real
             for j in meteors:
                 bossco=C_nivel1.coords(j.id)
-                if colision(lasco[0],lasco[1],50,89,bossco[0],bossco[1],100,100) and collFlag: #verifica colisión
+                if colision(lasco[0],lasco[1],1,89,bossco[0],bossco[1],100,100) and collFlag: #verifica colisión
                     collFlag=False
-                    reprod_fx("hit2.mp3") #sonido de daño
+                    reprod_fx("explo4.mp3") #sonido de daño
                     pts+=1
                     Label_nombre["text"]=nombre+"'s score: "+str(pts)+" pts"
                     C_nivel1.delete(j.id)
