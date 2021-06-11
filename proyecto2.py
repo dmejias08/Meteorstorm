@@ -245,10 +245,26 @@ class Niveles:
             C_nivel1.after(100,callback)   #llamada recursiva
 
         #carga el ship y el ship dañado y los agrega a una lista
-        ship=C_nivel1.create_image(300,750,anchor=NW, tags="ship")
+        ship=C_nivel1.create_image(300,700,anchor=NW, tags="ship")
         shipco=C_nivel1.coords(ship)
         animar(ship,"tile*.png")
         C_nivel1.laser=cargar_img("laser.png")
+
+        def coll_ship():
+            nonlocal C_nivel1, shipco, life, Label_nombre, nombre
+            global meteors
+            shipco=C_nivel1.coords(ship) #coordenadas en tiempo real
+            for j in meteors:
+                bossco=C_nivel1.coords(j.id)
+                if colision(shipco[0],shipco[1],50,89,bossco[0],bossco[1],100,100): #verifica colisión
+                    reprod_fx("hit2.mp3") #sonido de daño
+                    life-=1
+                    Label_life["text"]=nombre+"'s life: "+str(life)+" pts"
+                    C_nivel1.delete(j.id)
+                    meteors.remove(j)
+            def callback():
+                coll_ship()
+            C_nivel1.after(5 , callback)
 
         def laser_mov(i,objeto,collFlag=True): #mueve el laser
             nonlocal C_nivel1, shipco, pts, Label_nombre, nombre
@@ -270,11 +286,13 @@ class Niveles:
                 def callback():
                     laser_mov(i-0.1 ,objeto,collFlag)
                 C_nivel1.after(5 , callback)
+            else:
+                C_nivel1.delete(objeto)
                    
         def smooth_mov(objeto,i,j): #cree este algoritmo para que el movimiento de la nave fuera más suave
             global moveFlag, shipco #bandera, produce movimiento hasta keyrelease
             shipco=C_nivel1.coords(objeto)
-            if ((i==-1 and 550>shipco[0]) or (i==1 and shipco[0]>50) or (j==-1 and 751>shipco[1]) or (j==1 and shipco[1]>100)) and moveFlag:
+            if ((i==-1 and 500>shipco[0]) or (i==1 and shipco[0]>0) or (j==-1 and 700>shipco[1]) or (j==1 and shipco[1]>100)) and moveFlag:
                 C_nivel1.move(objeto,-i,-j)
                 def callback():
                     smooth_mov(objeto,i,j)
@@ -313,6 +331,8 @@ class Niveles:
             else:
                 moveFlag=False #deja de moverse
                 keyFlag=True #se puede leer la presion de una tecla
+
+        coll_ship()
         #eventos de press y release 
         nivel1.bind('<KeyPress>', move_ship)
         nivel1.bind('<KeyRelease>', stop_shoot)
@@ -416,7 +436,7 @@ def Vnivel2Check(): #check del box de nombre que no esté vacío y corre nivel 2
         L_saludo=Label(msgbox,text="Debe ingresar un nombre",font=fnt2)
         L_saludo.place(x=100, y=100, anchor="center")
     else:
-        Nivel02=Nivel2("assets\\nivel2.mp3","fondo2.png")
+        Nivel02=Niveles("assets\\nivel2.mp3","fondo2.png")
         Nivel02.basico()
 
 def Vnivel3Check(): #check del box de nombre que no esté vacío y corre nivel 3
@@ -426,7 +446,7 @@ def Vnivel3Check(): #check del box de nombre que no esté vacío y corre nivel 3
         L_saludo=Label(msgbox,text="Debe ingresar un nombre",font=fnt2)
         L_saludo.place(x=100, y=100, anchor="center")
     else:
-        Nivel03=Nivel3("assets\\nivel3.mp3","fondo3.png")
+        Nivel03=Niveles("assets\\nivel3.mp3","fondo3.png")
         Nivel03.basico()
 
 def checkPoints(Pts, Nombre, I): #guarda el puntaje en la lista
@@ -542,7 +562,7 @@ def info_adicional():
     C_info.place(x=0,y=0)
 
     #Asignación fondo de subventana Info
-    C_info.fondoI=cargar_img("fondo1.png")
+    C_info.fondoI=cargar_img("fondo4.png")
     fondoI = C_info.create_image(0,0,anchor=NW, image=C_info.fondoI)
 
     #Creación botón BACK
@@ -605,7 +625,7 @@ def mejores_puntajes():
     C_info.place(x=0,y=0)
 
     #Asignación fondo de subventana Info
-    C_info.fondoI=cargar_img("fondo1.png")
+    C_info.fondoI=cargar_img("fondo4.png")
     fondoI = C_info.create_image(0,0,anchor=NW, image=C_info.fondoI)
 
     #Creación botón BACK
@@ -636,12 +656,12 @@ Btn_nivel3=Button(ventana, text='Nivel 3',font=fnt,command=Vnivel3Check, bg="#85
 Btn_nivel3.place(x=300,y=520,anchor="center")
 
 #Creación botón para abrir subventana Puntajes
-#Btn_pt=Button(ventana, text='Mejores Puntajes',font=fnt,command=mejores_puntajes, bg="#850458", fg="#ffffff")
-#Btn_pt.place(x=300,y=620,anchor="center")
+Btn_pt=Button(ventana, text='Mejores Puntajes',font=fnt,command=mejores_puntajes, bg="#850458", fg="#ffffff")
+Btn_pt.place(x=300,y=620,anchor="center")
 
 #Creación botón para abrir subventana Información Adicional
-#Btn_info=Button(ventana, text='Información Adicional',font=fnt,command=info_adicional, bg="#850458", fg="#ffffff")
-#Btn_info.place(x=300,y=720,anchor="center")
+Btn_info=Button(ventana, text='Información Adicional',font=fnt,command=info_adicional, bg="#850458", fg="#ffffff")
+Btn_info.place(x=300,y=720,anchor="center")
 
 ventana.protocol("WM_DELETE_WINDOW", close)
 ventana.mainloop()
