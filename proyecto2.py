@@ -42,7 +42,7 @@ m=0
 s=0
 
 #Path variable 
-variable = '/'
+variable = '\\'
 
 
 #Creación de FLAGS para disparar, mover nave y señal de keyrelease
@@ -51,6 +51,7 @@ moveFlag=False
 keyFlag=True
 FLAG=True
 meteors=[]
+notdead=True
 
 #Texto de la  ventana de información adicional
 about="""
@@ -112,12 +113,12 @@ class Meteor:
             self.id=space
             return space
         def movimiento(meteor):
-            global shipco
+            global FLAG
             x0 = self.canvas.coords(meteor)[0]
             y0 = self.canvas.coords(meteor)[1]
             speed_x = choice([1,-1])
             speed_y = choice([1,-1])
-            while FLAG:
+            while FLAG and notdead:
                 self.coordi=self.canvas.coords(meteor)
                 self.canvas.move(meteor, speed_x, speed_y)
                 sleep(0.007)
@@ -131,7 +132,8 @@ class Meteor:
                     speed_y = 1
                 x0 += speed_x
                 y0 += speed_y
-        Thread(target=movimiento, args=(create_space(self.canvas, self.imagen),)).start()
+        if FLAG:
+            Thread(target=movimiento, args=(create_space(self.canvas, self.imagen),)).start()
            
 class Niveles:
     music=""
@@ -143,7 +145,7 @@ class Niveles:
         self.canvas=canvas
 
     def basico(self):
-        global FLAG, meteors
+        global FLAG, meteors, notdead
         FLAG=True
         sprFlag=True
         notdead=True
@@ -159,11 +161,11 @@ class Niveles:
         def end(): #función que calcula los bonuses en caso de finalizar, no hay bonuses en cierres forzados
             global ventana, h, m, s, FLAG
             nonlocal pts, nombre, life
-            FLAG=False
             if life==3 and h==0 and m==0 and s<=60: #si la vida es 50 entonces se obtiene +10 bonus
                 pts+=s
             reset_time()
             checkPoints(pts, nombre, 0)
+            FLAG=False
             sleep(0.5)
             detener_cancion()
             ventana.deiconify() #reaparece la ventana principal
@@ -224,9 +226,12 @@ class Niveles:
         C_nivel1.damage=cargar_img("damage1.png")
 
         def checkBoss(): #checa que ni el boss ni el jugador estén muertos
-            nonlocal life, C_nivel1, life, Label_time, notdead
-            if life<=0 and notdead:
+            nonlocal life, C_nivel1, life, Label_time
+            global meteors, notdead
+            if life<=0 and notdead and FLAG:
                 notdead=False
+                for i in meteors:
+                    C_nivel1.delete(i.id)
                 pause_time(Label_time) #pausa tiempo
                 reprod_fx("explo4.mp3") #reproduce explosión 
                 msgbox=Toplevel() #mensaje de juego finalizado
@@ -301,51 +306,29 @@ class Niveles:
 
         def coll_ship():
             nonlocal C_nivel1, shipco, life, Label_nombre, nombre, sprFlag
-            global meteors
+            global meteors, FLAG, notdead
             shipco=C_nivel1.coords(ship) #coordenadas en tiempo real
-            for j in meteors:
-                bossco=C_nivel1.coords(j.id)
-                if colision(shipco[0],shipco[1],100,100,bossco[0],bossco[1],100,100): #verifica colisión
-                    reprod_fx("bigfire.mp3") #sonido de daño
-                    life-=1
-                    Label_life["text"]=nombre+"'s life: "+str(life)+" pts"
-                    sprFlag=False #cambia a nave dañada
-                    def normal(): #vuelve a nave normal después de medio segundo
-                        nonlocal C_nivel1,sprFlag
-                        sprFlag=True
-                    C_nivel1.after(500,normal)
-                    C_nivel1.delete(j.id)
-                    meteors.remove(j)
-                    checkBoss()
-            def callback():
-                coll_ship()
-            C_nivel1.after(5 , callback)
-
-        def laser_mov(i,objeto,collFlag=True): #mueve el laser
-            nonlocal C_nivel1, shipco, pts, Label_nombre, nombre
-            global meteors
-            lasco=C_nivel1.coords(objeto) #coordenadas en tiempo real
-            for j in meteors:
-                bossco=C_nivel1.coords(j.id)
-                if colision(lasco[0],lasco[1],1,89,bossco[0],bossco[1],100,100) and collFlag: #verifica colisión
-                    collFlag=False
-                    reprod_fx("explo4.mp3") #sonido de daño
-                    pts+=1
-                    Label_nombre["text"]=nombre+"'s score: "+str(pts)+" pts"
-                    exp=C_nivel1.create_image(bossco[0],bossco[1],anchor=NW, tags="exp")
-                    animar_exp(exp,"tile**.png","assets/explosion/")
-                    C_nivel1.delete(j.id)
-                    meteors.remove(j)
-                    C_nivel1.delete(objeto)
-                    return
-            if lasco[1]>-100:
-                C_nivel1.move(objeto,0,i)
+            if FLAG and notdead:
+                for j in meteors:
+                    bossco=C_nivel1.coords(j.id)
+                    if colision(shipco[0],shipco[1],75,75,bossco[0],bossco[1],75,75): #verifica colisión
+                        reprod_fx("bigfire.mp3") #sonido de daño
+                        life-=1
+                        Label_life["text"]=nombre+"'s life: "+str(life)+" pts"
+                        sprFlag=False #cambia a nave dañada
+                        def normal(): #vuelve a nave normal después de medio segundo
+                            nonlocal C_nivel1,sprFlag
+                            sprFlag=True
+                        C_nivel1.after(500,normal)
+                        exp=C_nivel1.create_image(bossco[0],bossco[1],anchor=NW, tags="exp")
+                        animar_exp(exp,"tile**.png","assets/explosion/")
+                        C_nivel1.delete(j.id)
+                        meteors.remove(j)
+                        checkBoss()
                 def callback():
-                    laser_mov(i-0.1 ,objeto,collFlag)
+                        coll_ship()
                 C_nivel1.after(5 , callback)
-            else:
-                C_nivel1.delete(objeto)
-                   
+        
         def smooth_mov(objeto,i,j): #cree este algoritmo para que el movimiento de la nave fuera más suave
             global moveFlag, shipco #bandera, produce movimiento hasta keyrelease
             shipco=C_nivel1.coords(objeto)
@@ -355,15 +338,10 @@ class Niveles:
                     smooth_mov(objeto,i,j)
                 C_nivel1.after(2, callback)
 
-        def create_laser(canva,imagen) : #crea un laser cada vez que se dispara
-            reprod_fx("metal.mp3") #sonido de disparo
-            laser = canva.create_image(shipco[0]+50,shipco[1],anchor="center", image=imagen)
-            return laser_mov(0,laser)
-
         def move_ship(evento):  #verifica lo que toca el usuario en el teclado
             nonlocal C_nivel1, shipco, ship
-            global shootFlag, keyFlag, moveFlag
-            if keyFlag:
+            global shootFlag, keyFlag, moveFlag, FLAG
+            if keyFlag and FLAG:
                 moveFlag=True #inicia movimiento hasta keyrelease
                 if evento.keysym=="Left":
                     smooth_mov(ship,1,0)
@@ -374,20 +352,12 @@ class Niveles:
                 elif evento.keysym=="Down":
                     smooth_mov(ship,0,-1)
                 keyFlag=False #evita varias llamadas por estar presionado
-            elif evento.keysym=="space":
-                if shootFlag:
-                    shipco=C_nivel1.coords(ship)
-                    create_laser(C_nivel1,C_nivel1.laser)
-                    shootFlag=False #bloquea disparo presionado
 
         def stop_shoot(evento):
             global shootFlag, moveFlag, keyFlag #modifica ciertas banderas que dependen del keyreleas
             nonlocal life
-            if evento.keysym=="space" and life>0:
-                shootFlag=True #puede disparar luego de soltar mientras esté vivo
-            else:
-                moveFlag=False #deja de moverse
-                keyFlag=True #se puede leer la presion de una tecla
+            moveFlag=False #deja de moverse
+            keyFlag=True #se puede leer la presion de una tecla
 
         coll_ship()
         #eventos de press y release 
