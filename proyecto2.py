@@ -1,5 +1,3 @@
-
-
 #######################################
 ######## VERSION PYTHON 3.9.2 #########
 #######################################
@@ -41,17 +39,12 @@ h=0
 m=0
 s=0
 
-#Path variable 
-variable = '\\'
-
-
 #Creación de FLAGS para disparar, mover nave y señal de keyrelease
 shootFlag=True
 moveFlag=False
 keyFlag=True
 FLAG=True
 meteors=[]
-notdead=True
 
 #Texto de la  ventana de información adicional
 about="""
@@ -113,26 +106,29 @@ class Meteor:
             self.id=space
             return space
         def movimiento(meteor):
-            global FLAG
+            global shipco
             x0 = self.canvas.coords(meteor)[0]
             y0 = self.canvas.coords(meteor)[1]
             speed_x = choice([1,-1])
             speed_y = choice([1,-1])
-            while FLAG and notdead:
-                self.coordi=self.canvas.coords(meteor)
-                self.canvas.move(meteor, speed_x, speed_y)
-                sleep(0.007)
-                if x0 >= 500:
-                    speed_x = -1
-                if x0 <= 0:
-                    speed_x = 1
-                if y0 >= 700:
-                    speed_y = -1
-                if y0 <= 0:
-                    speed_y = 1
-                x0 += speed_x
-                y0 += speed_y
-        if FLAG:
+            while FLAG:
+                try:
+                    self.coordi=self.canvas.coords(meteor)
+                    self.canvas.move(meteor, speed_x, speed_y)
+                    sleep(0.007)
+                    if x0 >= 500:
+                        speed_x = -1
+                    if x0 <= 0:
+                        speed_x = 1
+                    if y0 >= 700:
+                        speed_y = -1
+                    if y0 <= 0:
+                        speed_y = 1
+                    x0 += speed_x
+                    y0 += speed_y
+                except:
+                    pass
+        if meteors!=[]:
             Thread(target=movimiento, args=(create_space(self.canvas, self.imagen),)).start()
            
 class Niveles:
@@ -145,10 +141,10 @@ class Niveles:
         self.canvas=canvas
 
     def basico(self):
-        global FLAG, meteors, notdead
+        global FLAG, meteors
         FLAG=True
-        sprFlag=True
         notdead=True
+        sprFlag=True
         pts=0
         life=3
         ventana.withdraw() #oculta ventana principal
@@ -158,32 +154,18 @@ class Niveles:
         nivel1.resizable(width=NO, height=NO)
         reprod_cancion(self.music)
 
-        def end(): #función que calcula los bonuses en caso de finalizar, no hay bonuses en cierres forzados
-            global ventana, h, m, s, FLAG
-            nonlocal pts, nombre, life
-            if life==3 and h==0 and m==0 and s<=60: #si la vida es 50 entonces se obtiene +10 bonus
-                pts+=s
-            reset_time()
-            checkPoints(pts, nombre, 0)
-            FLAG=False
-            sleep(0.5)
-            detener_cancion()
-            ventana.deiconify() #reaparece la ventana principal
-            nivel1.destroy() #cierra la subventana nivel1
-            #reprod_cancion("assets\\title.mp3")
-            reprod_cancion("assets"+variable+"title.mp3")
-
         def back(): #función del botón BACK
-            global ventana, FLAG
-            nonlocal pts, nombre
+            global ventana, FLAG, meteors
+            nonlocal pts, nombre, notdead, C_nivel1
+            meteors=[]
+            notdead=False
             FLAG=False
             reset_time()
-            checkPoints(pts, nombre, 0)
             sleep(0.5)
             detener_cancion()
             ventana.deiconify() #reaparece la ventana principal
             nivel1.destroy() #cierra la subventana nivel1
-            reprod_cancion("assets"+variable+"title.mp3")
+            reprod_cancion("assets\\title.mp3")
 
         def close(): #función de cierre
             nonlocal nivel1
@@ -221,34 +203,45 @@ class Niveles:
 
         Label_time=Label(C_nivel1, font=fnt3, bg="#850458", fg="#ffffff")
         Label_time.place(x=600,y=50,anchor=NE)
-        cronom(Label_time)#llamada al cronómetro
-
-        C_nivel1.damage=cargar_img("damage1.png")
-
-        def checkBoss(): #checa que ni el boss ni el jugador estén muertos
-            nonlocal life, C_nivel1, life, Label_time
-            global meteors, notdead
-            if life<=0 and notdead and FLAG:
-                notdead=False
-                for i in meteors:
-                    C_nivel1.delete(i.id)
-                pause_time(Label_time) #pausa tiempo
-                reprod_fx("explo4.mp3") #reproduce explosión 
+        
+        def cronom(LabelT): #función que genera el cronómetro
+            global timeFlag, h, m, s, meteors
+            nonlocal pts, Label_nombre
+            #Verificamos si los segundos y los minutos son mayores a 60
+            if s == 60:
+                pause_time(LabelT) #pausa tiempo
                 msgbox=Toplevel() #mensaje de juego finalizado
                 msgbox.minsize(600,600)
-                if life==0:
-                    L_saludo=Label(msgbox,text="JUEGO\nFINALIZADO\nPerdió",font=("Candara Light",30))
-                    L_saludo.place(x=300, y=300, anchor="center")
-                else:
-                    L_saludo=Label(msgbox,text="JUEGO\nFINALIZADO\nGanó",font=("Candara Light",30))
-                    L_saludo.place(x=300, y=300, anchor="center")
+                L_saludo=Label(msgbox,text="JUEGO\nFINALIZADO\nGanó",font=("Candara Light",30))
+                L_saludo.place(x=300, y=300, anchor="center")
+                meteors=[]
                 def fin(): #llama a la función end luego de 5 segundos
                     nonlocal msgbox
                     msgbox.destroy()
-                    end()
-                C_nivel1.after(5000,fin) 
-            else:
-                return
+                    if self.fondo[-5]=="1":
+                        checkPoints(60, nombre,0)
+                    elif self.fondo[-5]=="2":
+                        checkPoints(180, nombre,0)
+                    elif self.fondo[-5]=="3":
+                        checkPoints(300, nombre,0)
+                    back()
+                C_nivel1.after(5000,fin)
+
+            # iniciamos la cuenta progresiva de los segundos
+            LabelT['text'] ="Time: "+str(h)+":"+str(m).zfill(2)+":"+str(s).zfill(2) #modifica dinámicamente el texto del label de tiempo
+            if self.fondo[-5]=="1":
+                pts=s
+            elif self.fondo[-5]=="2":
+                pts=3*s
+            elif self.fondo[-5]=="3":
+                pts=5*s
+            Label_nombre['text'] =nombre+"'s score: "+str(pts)+" pts"
+            s+=1
+            if s<=60:
+                timeFlag=LabelT.after(1000, cronom, (LabelT)) #llamada recursiva cada 1 segundo
+        
+        cronom(Label_time)#llamada al cronómetro
+        C_nivel1.damage=cargar_img("damage1.png")
                 
         def colision(x1,y1,w1,h1,x2,y2,w2,h2): #verifica colisiones mediante comparaciones de rangos en un área coordenadas, ancho y alto
             if x1>x2+w2 or x1+w1<x2 or y1>y2+h2 or y1+h1<y2:
@@ -261,8 +254,9 @@ class Niveles:
             Thread(target = moverSprite, args=(0, id, imagen)).start()
 
         def animar_exp(id, patron,ruta):
-            imagen = cargarSprites(patron,ruta)
-            Thread(target = exp_anim, args=(0, id, imagen)).start()
+            if life>0:
+                imagen = cargarSprites(patron,ruta)
+                Thread(target = exp_anim, args=(0, id, imagen)).start()
 
         def cargarSprites(patron,ruta): #cargar las imagenes que forman la animacion
             frame_ruta = glob.glob(ruta+ patron) #ruta de frame 
@@ -277,26 +271,28 @@ class Niveles:
                 return cargarVarios(list_img[1:], listaResultado) # llamada recursiva 
 
         def moverSprite(i, id, lista):
-            nonlocal sprFlag
+            nonlocal sprFlag, notdead
             if i == 6 : #condición para continuar con la secuencia de imagenes 
                 i = 0
             def callback():  #funcion recursiva
                 moverSprite(i+1, id, lista)
-            if sprFlag:
+            if sprFlag and notdead:
                 C_nivel1.itemconfig(id, image = lista[i]) #cambiar las imagenes dentro del canvas y en elemento imagen
                 C_nivel1.after(100,callback)   #llamada recursiva
-            else:
+            elif sprFlag==False and notdead:
                 C_nivel1.itemconfig(id, image = C_nivel1.damage)
                 C_nivel1.after(500,callback)   #llamada recursiva 
 
         def exp_anim(i, id, lista):
+            nonlocal sprFlag, notdead
             if i == 33 : #condición para continuar con la secuencia de imagenes 
                 C_nivel1.delete(id)
                 return
             def callback():  #funcion recursiva
                 exp_anim(i+1, id, lista)
             C_nivel1.itemconfig(id, image = lista[i]) #cambiar las imagenes dentro del canvas y en elemento imagen
-            C_nivel1.after(25,callback)   #llamada recursiva
+            if notdead:
+                C_nivel1.after(25,callback)   #llamada recursiva
 
         #carga el ship y el ship dañado y los agrega a una lista
         ship=C_nivel1.create_image(300,700,anchor=NW, tags="ship")
@@ -304,15 +300,31 @@ class Niveles:
         animar(ship,"tile*.png",'assets/sprite/')
         C_nivel1.laser=cargar_img("laser.png")
 
+        def checklife():
+            nonlocal notdead, life
+            if life==0 and notdead:
+                notdead=False
+                pause_time(Label_time) #pausa tiempo
+                msgbox=Toplevel() #mensaje de juego finalizado
+                msgbox.minsize(600,600)
+                L_saludo=Label(msgbox,text="JUEGO\nFINALIZADO\nPerdió",font=("Candara Light",30))
+                L_saludo.place(x=300, y=300, anchor="center")
+                def fin(): #llama a la función end luego de 5 segundos
+                    nonlocal msgbox
+                    msgbox.destroy()
+                    checkPoints(pts,nombre,0)
+                    back()
+                C_nivel1.after(5000,fin)
+
         def coll_ship():
-            nonlocal C_nivel1, shipco, life, Label_nombre, nombre, sprFlag
-            global meteors, FLAG, notdead
+            nonlocal C_nivel1, shipco, life, Label_nombre, nombre, sprFlag, notdead
+            global meteors
             shipco=C_nivel1.coords(ship) #coordenadas en tiempo real
-            if FLAG and notdead:
+            if notdead:
                 for j in meteors:
                     bossco=C_nivel1.coords(j.id)
-                    if colision(shipco[0],shipco[1],75,75,bossco[0],bossco[1],75,75): #verifica colisión
-                        reprod_fx("bigfire.mp3") #sonido de daño
+                    if colision(shipco[0],shipco[1],75,75,bossco[0],bossco[1],75,75) and life>0: #verifica colisión
+                        reprod_fx("explo4.mp3") #sonido de daño
                         life-=1
                         Label_life["text"]=nombre+"'s life: "+str(life)+" pts"
                         sprFlag=False #cambia a nave dañada
@@ -324,24 +336,27 @@ class Niveles:
                         animar_exp(exp,"tile**.png","assets/explosion/")
                         C_nivel1.delete(j.id)
                         meteors.remove(j)
-                        checkBoss()
+                        if checklife():
+                            back()
+                            return
                 def callback():
-                        coll_ship()
+                    coll_ship()
                 C_nivel1.after(5 , callback)
-        
+                   
         def smooth_mov(objeto,i,j): #cree este algoritmo para que el movimiento de la nave fuera más suave
             global moveFlag, shipco #bandera, produce movimiento hasta keyrelease
+            nonlocal notdead
             shipco=C_nivel1.coords(objeto)
-            if ((i==-1 and 500>shipco[0]) or (i==1 and shipco[0]>0) or (j==-1 and 700>shipco[1]) or (j==1 and shipco[1]>100)) and moveFlag:
+            if ((i==-1 and 500>shipco[0]) or (i==1 and shipco[0]>0) or (j==-1 and 700>shipco[1]) or (j==1 and shipco[1]>100)) and moveFlag and notdead:
                 C_nivel1.move(objeto,-i,-j)
                 def callback():
                     smooth_mov(objeto,i,j)
                 C_nivel1.after(2, callback)
 
         def move_ship(evento):  #verifica lo que toca el usuario en el teclado
-            nonlocal C_nivel1, shipco, ship
-            global shootFlag, keyFlag, moveFlag, FLAG
-            if keyFlag and FLAG:
+            nonlocal C_nivel1, shipco, ship, notdead
+            global shootFlag, keyFlag, moveFlag
+            if keyFlag and notdead:
                 moveFlag=True #inicia movimiento hasta keyrelease
                 if evento.keysym=="Left":
                     smooth_mov(ship,1,0)
@@ -356,8 +371,11 @@ class Niveles:
         def stop_shoot(evento):
             global shootFlag, moveFlag, keyFlag #modifica ciertas banderas que dependen del keyreleas
             nonlocal life
-            moveFlag=False #deja de moverse
-            keyFlag=True #se puede leer la presion de una tecla
+            if evento.keysym=="space" and life>0:
+                shootFlag=True #puede disparar luego de soltar mientras esté vivo
+            else:
+                moveFlag=False #deja de moverse
+                keyFlag=True #se puede leer la presion de una tecla
 
         coll_ship()
         #eventos de press y release 
@@ -431,7 +449,7 @@ def Vnivel1Check(): #check del box de nombre que no esté vacío y corre nivel 1
         L_saludo=Label(msgbox,text="Debe ingresar un nombre",font=fnt2)
         L_saludo.place(x=100, y=100, anchor="center")
     else:
-        Nivel01=Niveles("assets"+variable+"nivel1.mp3", 'fondo1.png')
+        Nivel01=Niveles("assets\\nivel1.mp3","fondo1.png")
         Nivel01.basico()
         Nivel01.canvas.meteorito=cargar_img("meteor.png")
         im=Nivel01.canvas.meteorito
@@ -442,24 +460,38 @@ def Vnivel1Check(): #check del box de nombre que no esté vacío y corre nivel 1
         
 
 def Vnivel2Check(): #check del box de nombre que no esté vacío y corre nivel 2
+    global meteors
     if entry_text.get()=="":
         msgbox=Toplevel()
         msgbox.minsize(200,200)
         L_saludo=Label(msgbox,text="Debe ingresar un nombre",font=fnt2)
         L_saludo.place(x=100, y=100, anchor="center")
     else:
-        Nivel02=Niveles("assets"+variable+"nivel2.mp3","fondo2.png")
+        Nivel02=Niveles("assets\\nivel2.mp3","fondo2.png")
         Nivel02.basico()
+        Nivel02.canvas.meteorito=cargar_img("meteor.png")
+        im=Nivel02.canvas.meteorito
+        ca=Nivel02.canvas
+        meteors=[Meteor(ca,im,0),Meteor(ca,im,0),Meteor(ca,im,0),Meteor(ca,im,0),Meteor(ca,im,0),Meteor(ca,im,0),Meteor(ca,im,0)]
+        for i in meteors:
+            i.obstaculo()
 
 def Vnivel3Check(): #check del box de nombre que no esté vacío y corre nivel 3
+    global meteors
     if entry_text.get()=="":
         msgbox=Toplevel()
         msgbox.minsize(200,200)
         L_saludo=Label(msgbox,text="Debe ingresar un nombre",font=fnt2)
         L_saludo.place(x=100, y=100, anchor="center")
     else:
-        Nivel03=Niveles("assets"+variable+"nivel3.mp3","fondo3.png")
+        Nivel03=Niveles("assets\\nivel3.mp3","fondo3.png")
         Nivel03.basico()
+        Nivel03.canvas.meteorito=cargar_img("meteor.png")
+        im=Nivel03.canvas.meteorito
+        ca=Nivel03.canvas
+        meteors=[Meteor(ca,im,0),Meteor(ca,im,0),Meteor(ca,im,0),Meteor(ca,im,0),Meteor(ca,im,0),Meteor(ca,im,0),Meteor(ca,im,0),Meteor(ca,im,0),Meteor(ca,im,0)]
+        for i in meteors:
+            i.obstaculo()
 
 def checkPoints(Pts, Nombre, I): #guarda el puntaje en la lista
     global puntajes, nombres
@@ -505,20 +537,6 @@ def mensajePuntos(Pts,Pos): #función que genera mensaje al ganador de nuevo rec
     L_score=Label(msgbox,text=f"Usted se encuentra entre \nlos mejores puntajes,\nobtuvo la posición {Pos} \ncon {Pts} puntos",font=("Candara Light",24))
     L_score.place(x=300, y=300, anchor="center")
 
-def cronom(Label): #función que genera el cronómetro
-    global timeFlag, h, m, s
-    #Verificamos si los segundos y los minutos son mayores a 60
-    if s >= 60:
-        s=0
-        m+=1
-        if m >= 60:
-            m=0
-            h+=1
-    # iniciamos la cuenta progresiva de los segundos
-    Label['text'] ="Time: "+str(h)+":"+str(m).zfill(2)+":"+str(s).zfill(2) #modifica dinámicamente el texto del label de tiempo
-    s+=1
-    timeFlag=Label.after(1000, cronom, (Label)) #llamada recursiva cada 1 segundo
-
 def reset_time(): #resetea las variables de tiempo a 0
     global h, m, s
     h=0
@@ -529,7 +547,7 @@ def pause_time(Label): #pausa el cronómetro
     global timeFlag
     Label.after_cancel(timeFlag)
 
-reprod_cancion("assets"+variable+"title.mp3") #reproduce musica de fondo con
+reprod_cancion("assets\\title.mp3") #reproduce musica de fondo con
 
 ##############################################################################################################
                                                 # About #
