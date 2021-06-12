@@ -41,6 +41,10 @@ h=0
 m=0
 s=0
 
+#Path variable 
+variable = '/'
+
+
 #Creación de FLAGS para disparar, mover nave y señal de keyrelease
 shootFlag=True
 moveFlag=False
@@ -164,7 +168,8 @@ class Niveles:
             detener_cancion()
             ventana.deiconify() #reaparece la ventana principal
             nivel1.destroy() #cierra la subventana nivel1
-            reprod_cancion("assets\\title.mp3")
+            #reprod_cancion("assets\\title.mp3")
+            reprod_cancion("assets"+variable+"title.mp3")
 
         def back(): #función del botón BACK
             global ventana, FLAG
@@ -176,7 +181,7 @@ class Niveles:
             detener_cancion()
             ventana.deiconify() #reaparece la ventana principal
             nivel1.destroy() #cierra la subventana nivel1
-            reprod_cancion("assets\\title.mp3")
+            reprod_cancion("assets"+variable+"title.mp3")
 
         def close(): #función de cierre
             nonlocal nivel1
@@ -456,8 +461,7 @@ def Vnivel1Check(): #check del box de nombre que no esté vacío y corre nivel 1
         L_saludo=Label(msgbox,text="Debe ingresar un nombre",font=fnt2)
         L_saludo.place(x=100, y=100, anchor="center")
     else:
-        Nivel01=Niveles("assets\\nivel1.mp3",
-        )
+        Nivel01=Niveles("assets"+variable+"nivel1.mp3", 'fondo1.png')
         Nivel01.basico()
         Nivel01.canvas.meteorito=cargar_img("meteor.png")
         im=Nivel01.canvas.meteorito
@@ -474,7 +478,7 @@ def Vnivel2Check(): #check del box de nombre que no esté vacío y corre nivel 2
         L_saludo=Label(msgbox,text="Debe ingresar un nombre",font=fnt2)
         L_saludo.place(x=100, y=100, anchor="center")
     else:
-        Nivel02=Niveles("assets\\nivel2.mp3","fondo2.png")
+        Nivel02=Niveles("assets"+variable+"nivel2.mp3","fondo2.png")
         Nivel02.basico()
 
 def Vnivel3Check(): #check del box de nombre que no esté vacío y corre nivel 3
@@ -484,7 +488,7 @@ def Vnivel3Check(): #check del box de nombre que no esté vacío y corre nivel 3
         L_saludo=Label(msgbox,text="Debe ingresar un nombre",font=fnt2)
         L_saludo.place(x=100, y=100, anchor="center")
     else:
-        Nivel03=Niveles("assets\\nivel3.mp3","fondo3.png")
+        Nivel03=Niveles("assets"+variable+"nivel3.mp3","fondo3.png")
         Nivel03.basico()
 
 def checkPoints(Pts, Nombre, I): #guarda el puntaje en la lista
@@ -555,7 +559,7 @@ def pause_time(Label): #pausa el cronómetro
     global timeFlag
     Label.after_cancel(timeFlag)
 
-reprod_cancion("assets\\title.mp3") #reproduce musica de fondo con
+reprod_cancion("assets"+variable+"title.mp3") #reproduce musica de fondo con
 
 ##############################################################################################################
                                                 # About #
