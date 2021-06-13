@@ -1,5 +1,13 @@
+<<<<<<< Updated upstream
 d66
 d11
 j05
 gh05
 Geo05
+=======
+f80
+Geo300
+j180
+Geo60
+j150
+>>>>>>> Stashed changes

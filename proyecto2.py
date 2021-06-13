@@ -104,7 +104,7 @@ class Meteor: #Clase Meteorito
 
     def obstaculo(self): #Creacion del id para objeto meteorito 
         def create_space(canva,imagen) : #crea un meteor
-            space = canva.create_image(randint(50,450),randint(100,650),anchor=NW, image=imagen, tags="meteorito")
+            space = canva.create_image(randint(50,450),randint(100,550),anchor=NW, image=imagen, tags="meteorito")
             self.id=space
             return space
         def movimiento(meteor): #Toma objeto y lo mueve 
@@ -117,7 +117,7 @@ class Meteor: #Clase Meteorito
                 try:
                     self.coordi=self.canvas.coords(meteor) #Actulizacion de coordenadas 
                     self.canvas.move(meteor, speed_x, speed_y)
-                    sleep(0.007)
+                    sleep(0.006)
                     if x0 >= 500:
                         speed_x = -1
                     if x0 <= 0:
@@ -353,7 +353,7 @@ class Niveles: #Inico de clase niveles
                 C_nivel1.move(objeto,-i,-j)
                 def callback():
                     smooth_mov(objeto,i,j)
-                C_nivel1.after(2, callback)
+                C_nivel1.after(1, callback)
 
         def move_ship(evento):  #verifica lo que toca el usuario en el teclado
             nonlocal C_nivel1, shipco, ship, notdead
