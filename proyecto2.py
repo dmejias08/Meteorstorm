@@ -67,7 +67,7 @@ shipco=[]
 def guardar_archivo(archivo, i=0): #Función para guardar archivo de texto
     global puntajes
     try:
-        archivo.write(puntajes[i][0]+(str(puntajes[i][1]).zfill(2))+"\n") #guarda nombrepuntaje en cada linea de texto, los últimos 2 caractéres son números
+        archivo.write(puntajes[i][0]+(str(puntajes[i][1]).zfill(3))+"\n") #guarda nombrepuntaje en cada linea de texto, los últimos 2 caractéres son números
         guardar_archivo(archivo,i+1)
     except:
         archivo.close()
@@ -76,7 +76,7 @@ def leer_archivo(archivo, i=1): #Función para leer el archrivo de texto con pun
     global puntajes
     try:
         line=archivo.readline() #toma los últimos 2 digitos de cada line y los toma como el puntaje, el resto es el nombre
-        puntajes.append([line[:-3],int(line[-3:])])
+        puntajes.append([line[:-4],int(line[-4:])])
         leer_archivo(archivo, i+1)
     except:
         archivo.close()
@@ -120,12 +120,16 @@ class Meteor: #Clase Meteorito
                     sleep(0.006)
                     if x0 >= 500:
                         speed_x = -1
+                        reprod_fx("thump.mp3")
                     if x0 <= 0:
                         speed_x = 1
+                        reprod_fx("thump.mp3")
                     if y0 >= 700:
                         speed_y = -1
+                        reprod_fx("thump.mp3")
                     if y0 <= 0:
                         speed_y = 1
+                        reprod_fx("thump.mp3")
                     x0 += speed_x
                     y0 += speed_y
                 except:
