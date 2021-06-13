@@ -612,6 +612,12 @@ def info_adicional():
     L_about=Label(info,font=fnt, bg="#ffffff", fg="#000000", text=about)
     L_about.place(x=300, y=380, anchor="center")
 
+    C_info.geo=cargar_img("geo.png")
+    geoF = C_info.create_image(150,700,anchor="center", image=C_info.geo)
+
+    C_info.dian=cargar_img("dian.png")
+    dianF = C_info.create_image(450,700,anchor="center", image=C_info.dian)
+
     info.protocol("WM_DELETE_WINDOW",close) 
 
 ##############################################################################################################
