@@ -46,6 +46,8 @@ keyFlag=True
 FLAG=True
 meteors=[]
 
+variable = "/"
+
 #Texto de la  ventana de información adicional
 about="""
 Costa Rica
@@ -92,7 +94,7 @@ ventana.resizable(width=NO, height=NO)
                                              # Clase Niveles #
 ##############################################################################################################
 
-class Meteor:
+class Meteor: #Clase Meteorito 
     def __init__(self, canvas, imagen, id):
         self.canvas=canvas
         self.imagen=imagen
@@ -100,12 +102,12 @@ class Meteor:
     def getCoords(self):
         print(self.coordi)
 
-    def obstaculo(self):
+    def obstaculo(self): #Creacion del id para objeto meteorito 
         def create_space(canva,imagen) : #crea un meteor
             space = canva.create_image(randint(50,450),randint(100,650),anchor=NW, image=imagen, tags="meteorito")
             self.id=space
             return space
-        def movimiento(meteor):
+        def movimiento(meteor): #Toma objeto y lo mueve 
             global shipco
             x0 = self.canvas.coords(meteor)[0]
             y0 = self.canvas.coords(meteor)[1]
@@ -113,7 +115,7 @@ class Meteor:
             speed_y = choice([1,-1])
             while FLAG:
                 try:
-                    self.coordi=self.canvas.coords(meteor)
+                    self.coordi=self.canvas.coords(meteor) #Actulizacion de coordenadas 
                     self.canvas.move(meteor, speed_x, speed_y)
                     sleep(0.007)
                     if x0 >= 500:
@@ -128,10 +130,10 @@ class Meteor:
                     y0 += speed_y
                 except:
                     pass
-        if meteors!=[]:
-            Thread(target=movimiento, args=(create_space(self.canvas, self.imagen),)).start()
+        if meteors!=[]: #Verifica condicion de finalizacion 
+            Thread(target=movimiento, args=(create_space(self.canvas, self.imagen),)).start() #Inicio de hilo movimiento 
            
-class Niveles:
+class Niveles: #Inico de clase niveles 
     music=""
     fondo=""
     canvas=0
@@ -165,7 +167,7 @@ class Niveles:
             detener_cancion()
             ventana.deiconify() #reaparece la ventana principal
             nivel1.destroy() #cierra la subventana nivel1
-            reprod_cancion("assets\\title.mp3")
+            reprod_cancion("assets"+variable+"title.mp3")
 
         def close(): #función de cierre
             nonlocal nivel1
@@ -449,7 +451,7 @@ def Vnivel1Check(): #check del box de nombre que no esté vacío y corre nivel 1
         L_saludo=Label(msgbox,text="Debe ingresar un nombre",font=fnt2)
         L_saludo.place(x=100, y=100, anchor="center")
     else:
-        Nivel01=Niveles("assets\\nivel1.mp3","fondo1.png")
+        Nivel01=Niveles("assets"+variable+"nivel1.mp3","fondo1.png")
         Nivel01.basico()
         Nivel01.canvas.meteorito=cargar_img("meteor.png")
         im=Nivel01.canvas.meteorito
@@ -467,7 +469,7 @@ def Vnivel2Check(): #check del box de nombre que no esté vacío y corre nivel 2
         L_saludo=Label(msgbox,text="Debe ingresar un nombre",font=fnt2)
         L_saludo.place(x=100, y=100, anchor="center")
     else:
-        Nivel02=Niveles("assets\\nivel2.mp3","fondo2.png")
+        Nivel02=Niveles("assets"+variable+"nivel2.mp3","fondo2.png")
         Nivel02.basico()
         Nivel02.canvas.meteorito=cargar_img("meteor.png")
         im=Nivel02.canvas.meteorito
@@ -484,7 +486,7 @@ def Vnivel3Check(): #check del box de nombre que no esté vacío y corre nivel 3
         L_saludo=Label(msgbox,text="Debe ingresar un nombre",font=fnt2)
         L_saludo.place(x=100, y=100, anchor="center")
     else:
-        Nivel03=Niveles("assets\\nivel3.mp3","fondo3.png")
+        Nivel03=Niveles("assets"+variable+"nivel3.mp3","fondo3.png")
         Nivel03.basico()
         Nivel03.canvas.meteorito=cargar_img("meteor.png")
         im=Nivel03.canvas.meteorito
@@ -547,7 +549,7 @@ def pause_time(Label): #pausa el cronómetro
     global timeFlag
     Label.after_cancel(timeFlag)
 
-reprod_cancion("assets\\title.mp3") #reproduce musica de fondo con
+reprod_cancion("assets"+variable+"title.mp3") #reproduce musica de fondo con
 
 ##############################################################################################################
                                                 # About #
