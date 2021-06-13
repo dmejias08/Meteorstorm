@@ -57,6 +57,7 @@ Taller de Programación, 2021, Grupo 2
 Milton Villegas Lemus
 Versión 1.0
 Geovanny García Downing
+Diana Mejías Hernandez
 """
 #Listas que contienen puntajes y nombres del top 5 puntajes
 puntajes=[]
@@ -504,13 +505,13 @@ def checkPoints(Pts, Nombre): #guarda el puntaje en la lista
     global puntajes, archivo
     puntajes.append([Nombre,Pts])
     listaN=insertion(puntajes)
-    if len(listaN)==11:
+    if len(listaN)>=11:
         listaN=listaN[1:];
     if listaN!=puntajes or len(listaN)<=10:
+        pos=0
         reprod_fx("congratulations.mp3")
         for i in range(1,len(listaN)+1):
             if listaN[-i]==[Nombre,Pts]:
-                print(listaN[-i])
                 pos=i
         mensajePuntos(Pts,pos)
     puntajes=listaN
