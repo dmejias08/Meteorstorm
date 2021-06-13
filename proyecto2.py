@@ -46,7 +46,7 @@ keyFlag=True
 FLAG=True
 meteors=[]
 
-variable = "/"
+variable = "\\"
 
 #Texto de la  ventana de información adicional
 about="""
@@ -64,19 +64,18 @@ nombres=[]
 shipco=[]
 
 def guardar_archivo(archivo, i=0): #Función para guardar archivo de texto
-    global nombres, puntajes
+    global puntajes
     try:
-        archivo.write(nombres[i]+(str(puntajes[i]).zfill(2))+"\n") #guarda nombrepuntaje en cada linea de texto, los últimos 2 caractéres son números
+        archivo.write(puntajes[i][0]+(str(puntajes[i][1]).zfill(2))+"\n") #guarda nombrepuntaje en cada linea de texto, los últimos 2 caractéres son números
         guardar_archivo(archivo,i+1)
     except:
         archivo.close()
         
 def leer_archivo(archivo, i=1): #Función para leer el archrivo de texto con puntajes y nombre
-    global nombres, puntajes
+    global puntajes
     try:
         line=archivo.readline() #toma los últimos 2 digitos de cada line y los toma como el puntaje, el resto es el nombre
-        puntajes.append(int(line[-3:]))
-        nombres.append(line[:-3])
+        puntajes.append([line[:-3],int(line[-3:])])
         leer_archivo(archivo, i+1)
     except:
         archivo.close()
@@ -156,6 +155,12 @@ class Niveles: #Inico de clase niveles
         nivel1.resizable(width=NO, height=NO)
         reprod_cancion(self.music)
 
+        def backB():
+            nonlocal pts, nombre, Label_time
+            pause_time(Label_time)
+            checkPoints(pts,nombre)
+            back()
+
         def back(): #función del botón BACK
             global ventana, FLAG, meteors
             nonlocal pts, nombre, notdead, C_nivel1
@@ -190,7 +195,7 @@ class Niveles: #Inico de clase niveles
 
         #Creación del botón BACK
         C_app.back=cargar_img("back.png") #carga imagen para elbotón
-        Btn_back=Button(C_nivel1, text='saludar',image=C_app.back, font=fnt, command=back)
+        Btn_back=Button(C_nivel1, text='saludar',image=C_app.back, font=fnt, command=backB)
         Btn_back.place(x=600,y=0, anchor=NE)
 
         #obtiene el nombre del entry
@@ -221,11 +226,11 @@ class Niveles: #Inico de clase niveles
                     nonlocal msgbox
                     msgbox.destroy()
                     if self.fondo[-5]=="1":
-                        checkPoints(60, nombre,0)
+                        checkPoints(60, nombre)
                     elif self.fondo[-5]=="2":
-                        checkPoints(180, nombre,0)
+                        checkPoints(180, nombre)
                     elif self.fondo[-5]=="3":
-                        checkPoints(300, nombre,0)
+                        checkPoints(300, nombre)
                     back()
                 C_nivel1.after(5000,fin)
 
@@ -314,7 +319,7 @@ class Niveles: #Inico de clase niveles
                 def fin(): #llama a la función end luego de 5 segundos
                     nonlocal msgbox
                     msgbox.destroy()
-                    checkPoints(pts,nombre,0)
+                    checkPoints(pts,nombre)
                     back()
                 C_nivel1.after(5000,fin)
 
@@ -495,44 +500,40 @@ def Vnivel3Check(): #check del box de nombre que no esté vacío y corre nivel 3
         for i in meteors:
             i.obstaculo()
 
-def checkPoints(Pts, Nombre, I): #guarda el puntaje en la lista
-    global puntajes, nombres
-    if Pts>0:
-        if puntajes!=[]: #si está vacía nada más agrega al final
-            try: #si la lista se sale de rango
-                puntajes[I]
-                if puntajes[I]<=Pts: #compara cada valor con los puntos
-                    puntajes=puntajes[:I]+[Pts]+puntajes[I:] #quiebra lista y mete en medio
-                    nombres=nombres[:I]+[Nombre]+nombres[I:]
-                    try:
-                        puntajes[5] #en caso de agregar un extra espacio, se elimina, quedando sólo 5
-                        puntajes=puntajes[:-1]
-                    except:
-                        pass
-                    archivo=open("puntajes.txt","w+") #guarda en archivo
-                    guardar_archivo(archivo)
-                    reprod_fx("congratulations.mp3")
-                    return mensajePuntos(Pts,I+1) #i+1 es la posición en la que el jugador quedó y llama a la función que envía mensaje a ganador de nuevo record
-                else:
-                    return checkPoints(Pts, Nombre, I+1) #llamada recursiva
-            except: #si se sale de rango y el i es menor a 5 se agrega al final
-                if I<5:
-                    nombres+=[Nombre]
-                    puntajes+=[Pts]
-                    archivo=open("puntajes.txt","w+") #guarda archivo
-                    guardar_archivo(archivo)
-                    reprod_fx("congratulations.mp3")
-                    return mensajePuntos(Pts,I+1) #llama a la función que envía mensaje a ganador de nuevo record
-                else:
-                    pass
-        else:
-            nombres+=[Nombre] #agrega al final en caso de vacía
-            puntajes+=[Pts]
-            archivo=open("puntajes.txt","w+") #guarda en archivo
-            guardar_archivo(archivo)
-            reprod_fx("congratulations.mp3")
-            return mensajePuntos(Pts,I+1)
+def checkPoints(Pts, Nombre): #guarda el puntaje en la lista
+    global puntajes, archivo
+    puntajes.append([Nombre,Pts])
+    listaN=insertion(puntajes)
+    if len(listaN)==11:
+        listaN=listaN[1:];
+    if listaN!=puntajes or len(listaN)<=10:
+        reprod_fx("congratulations.mp3")
+        for i in range(1,len(listaN)+1):
+            if listaN[-i]==[Nombre,Pts]:
+                print(listaN[-i])
+                pos=i
+        mensajePuntos(Pts,pos)
+    puntajes=listaN
+    archivo=open("puntajes.txt","w+") #guarda en archivo
+    guardar_archivo(archivo)
 
+def insertion(Lista):
+    return insertion_aux(Lista,1,len(Lista))
+
+def insertion_aux(Lista,i,n):
+    if i==n:
+        return Lista
+    Aux=Lista[i]
+    j=incluye_orden(Lista,i,Aux[1])
+    Lista[j]=Aux
+    return insertion_aux(Lista,i+1,n)
+
+def incluye_orden(Lista,j,Aux):
+    if j<=0 or Lista[j-1][1]<=Aux:
+        return j
+    Lista[j]=Lista[j-1]
+    return incluye_orden(Lista,j-1,Aux)
+    
 def mensajePuntos(Pts,Pos): #función que genera mensaje al ganador de nuevo record
     msgbox=Toplevel()
     msgbox.minsize(600,600)
@@ -626,7 +627,7 @@ def mejores_puntajes():
     Restricciones: no aplica
     Modulos usados: back, close, tablero,
     """
-    global puntajes, nombres, ventana, about
+    global puntajes, ventana, about
     ventana.withdraw() #oculta ventana principal
     info=Toplevel() #creción de subventana de información adicional y características por Toplevel
     info.title("Información Adicional")
@@ -634,10 +635,13 @@ def mejores_puntajes():
     info.resizable(width=NO, height=NO)
     
     def tablero(Puntajes,I): #retorna un texto con los puntajes, nombres y posiciones
-        if Puntajes==[]:
+        try:
+            if I==-1:
+                return ""
+            else:
+                return f"{len(Puntajes)-I}. {Puntajes[I][0]} \t\t---> {Puntajes[I][1]}\n" + tablero(Puntajes,I-1)
+        except:
             return ""
-        else:
-            return f"{I+1}. {nombres[I]} \t\t---> {Puntajes[0]}\n" + tablero(Puntajes[1:],I+1)
 
     def back(): #función del botón BACK
         global ventana
@@ -666,7 +670,7 @@ def mejores_puntajes():
     Btn_back.place(x=600,y=0, anchor=NE)
 
     #Label con el texto de info adicional (about)
-    L_about=Label(info,font=fnt, bg="#ffffff", fg="#000000", text=tablero(puntajes,0))
+    L_about=Label(info,font=fnt, bg="#ffffff", fg="#000000", text=tablero(puntajes,len(puntajes)-1))
     L_about.place(x=300, y=380, anchor="center")
 
     info.protocol("WM_DELETE_WINDOW",close) 

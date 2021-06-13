@@ -1,13 +1,10 @@
-<<<<<<< Updated upstream
-d66
-d11
-j05
-gh05
-Geo05
-=======
-f80
-Geo300
-j180
+k03
+Hey04
+k14
+Geo19
+J42
 Geo60
-j150
->>>>>>> Stashed changes
+Geo60
+Hola60
+Hola60
+Hola120
