@@ -202,13 +202,13 @@ class Niveles: #Inico de clase niveles
         nombre=E_nombre.get()
 
         #Labels con info del jugador
-        Label_nombre=Label(C_nivel1, font=fnt3, bg="#850458", fg="#ffffff", text=nombre+"'s score: "+str(pts)+" pts")
+        Label_nombre=Label(C_nivel1, font=fnt3, bg="#002663", fg="#ffffff", text=nombre+"'s score: "+str(pts)+" pts")
         Label_nombre.place(x=0,y=0,anchor=NW)
 
-        Label_life=Label(C_nivel1, font=fnt3, bg="#850458", fg="#ffffff", text=nombre+"'s life: "+str(life)+" pts")
+        Label_life=Label(C_nivel1, font=fnt3, bg="#002663", fg="#ffffff", text=nombre+"'s life: "+str(life)+" pts")
         Label_life.place(x=0,y=50,anchor=NW)
 
-        Label_time=Label(C_nivel1, font=fnt3, bg="#850458", fg="#ffffff")
+        Label_time=Label(C_nivel1, font=fnt3, bg="#002663", fg="#ffffff")
         Label_time.place(x=600,y=50,anchor=NE)
         
         def cronom(LabelT): #función que genera el cronómetro
@@ -434,7 +434,7 @@ def reprod_cancion(MP3): #función para reproducir canción
 def reproducir_salida(): #función efecto de salida
     reprod_fx("goodbye.mp3")
 
-L_about=Label(ventana, font=fnt, bg="#850458", fg="#ffffff", text="Ingrese su nombre")
+L_about=Label(ventana, font=fnt, bg="#002663", fg="#ffffff", text="Ingrese su nombre")
 L_about.place(x=300,y=150,anchor="center")
 
 #Modificado del código de: Samuel Enrique Molina Bermudez
@@ -676,27 +676,27 @@ def mejores_puntajes():
     info.protocol("WM_DELETE_WINDOW",close) 
 
 
-Btn_jugar=Button(ventana, text='Jugar',font=fnt,command=Vnivel1Check, bg="#850458", fg="#ffffff")
+Btn_jugar=Button(ventana, text='Jugar',font=fnt,command=Vnivel1Check, bg="#002663", fg="#ffffff")
 Btn_jugar.place(x=400,y=220,anchor="center")    
     
 #Creación botón para abrir subventana Nivel 1
-Btn_nivel1=Button(ventana, text='Nivel 1',font=fnt,command=Vnivel1Check, bg="#850458", fg="#ffffff")
+Btn_nivel1=Button(ventana, text='Nivel 1',font=fnt,command=Vnivel1Check, bg="#002663", fg="#ffffff")
 Btn_nivel1.place(x=300,y=320,anchor="center")
 
 #Creación botón para abrir subventana Nivel 2
-Btn_nivel2=Button(ventana, text='Nivel 2',font=fnt,command=Vnivel2Check, bg="#850458", fg="#ffffff")
+Btn_nivel2=Button(ventana, text='Nivel 2',font=fnt,command=Vnivel2Check, bg="#002663", fg="#ffffff")
 Btn_nivel2.place(x=300,y=420,anchor="center")
 
 #Creación botón para abrir subventana Nivel 3
-Btn_nivel3=Button(ventana, text='Nivel 3',font=fnt,command=Vnivel3Check, bg="#850458", fg="#ffffff")
+Btn_nivel3=Button(ventana, text='Nivel 3',font=fnt,command=Vnivel3Check, bg="#002663", fg="#ffffff")
 Btn_nivel3.place(x=300,y=520,anchor="center")
 
 #Creación botón para abrir subventana Puntajes
-Btn_pt=Button(ventana, text='Mejores Puntajes',font=fnt,command=mejores_puntajes, bg="#850458", fg="#ffffff")
+Btn_pt=Button(ventana, text='Mejores Puntajes',font=fnt,command=mejores_puntajes, bg="#002663", fg="#ffffff")
 Btn_pt.place(x=300,y=620,anchor="center")
 
 #Creación botón para abrir subventana Información Adicional
-Btn_info=Button(ventana, text='Información Adicional',font=fnt,command=info_adicional, bg="#850458", fg="#ffffff")
+Btn_info=Button(ventana, text='Información Adicional',font=fnt,command=info_adicional, bg="#002663", fg="#ffffff")
 Btn_info.place(x=300,y=720,anchor="center")
 
 ventana.protocol("WM_DELETE_WINDOW", close)
