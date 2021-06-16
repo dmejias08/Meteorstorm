@@ -14,7 +14,7 @@ Editor: Geovanny García Downing, 2020092224
 Entradas: no aplica
 Salidas: ventana en ciclo TK
 Restricciones: no aplica
-Modulos usados: guardar_archivo, leer_archivo, close, cargar_imagen, cargarMP3, reprod_FX, detener_cancion, reprod_cancion, reproducir_salida, limitador, Vnivel1Check, Vnivel2Check, Vnivel3Check, checkPoints, mensajePuntos, cronom, reset_time, pause_time, Vnivel1, Vnivel2, Vnivel3, info_adicional, mejores_puntajes, autodocumentacion
+Modulos usados: guardar_archivo, leer_archivo, close, cargar_imagen, cargarMP3, reprod_FX, detener_cancion, reprod_cancion, reproducir_salida, limitador, Vnivel1Check, Vnivel2Check, Vnivel3Check, checkPoints, mensajePuntos, cronom, reset_time, pause_time, Vnivel1, Vnivel2, Vnivel3, info_adicional, mejores_puntajes, autodocumentacion, insertion, quick, partir
 Modulos modificados: Se reutilizó código de la tarea, cargar_imagen, abarcado por José Fernando Morales en el taller
 Codigo modificado facilitado por: Jose Fernando Morales
 """
@@ -95,6 +95,20 @@ ventana.resizable(width=NO, height=NO)
 ##############################################################################################################
 
 class Meteor: #Clase Meteorito 
+    """
+    Costa Rica
+    Instituto Tecnológico de Costa Rica
+    Área Académica de Ingeniería en Computadores
+    Taller de Programación, 2021, Grupo 2
+    Milton Villegas Lemus
+    Version Python 3.9.2
+    Versión del codigo 1.0
+    Editor: Geovanny García Downing, 2020092224
+    Entradas: no aplica
+    Salidas: ventana en ciclo TopLevel
+    Restricciones: no aplica
+    Modulos usados: getCoords, obstáculo, movimiento
+    """
     def __init__(self, canvas, imagen, id):
         self.canvas=canvas
         self.imagen=imagen
@@ -137,7 +151,21 @@ class Meteor: #Clase Meteorito
         if meteors!=[]: #Verifica condicion de finalizacion 
             Thread(target=movimiento, args=(create_space(self.canvas, self.imagen),)).start() #Inicio de hilo movimiento 
            
-class Niveles: #Inico de clase niveles 
+class Niveles: #Inico de clase niveles
+    """
+    Costa Rica
+    Instituto Tecnológico de Costa Rica
+    Área Académica de Ingeniería en Computadores
+    Taller de Programación, 2021, Grupo 2
+    Milton Villegas Lemus
+    Version Python 3.9.2
+    Versión del codigo 1.0
+    Editor: Geovanny García Downing, 2020092224
+    Entradas: no aplica
+    Salidas: ventana en ciclo TopLevel
+    Restricciones: no aplica
+    Modulos usados: basico, back, backB, close, cronom, animar_exp, animar,cargarSprite, moverSprite, cargarVarios, exp_anim, checkLife, coll_ship. smooth_move, moveShip
+    """ 
     music=""
     fondo=""
     canvas=0
@@ -456,6 +484,20 @@ def limitador(entry_text): #limita el texto a 12 caracteres
 entry_text.trace("w", lambda *args: limitador(entry_text))
 
 def Vnivel1Check(): #check del box de nombre que no esté vacío y corre nivel 1
+    """
+    Costa Rica
+    Instituto Tecnológico de Costa Rica
+    Área Académica de Ingeniería en Computadores
+    Taller de Programación, 2021, Grupo 2
+    Milton Villegas Lemus
+    Version Python 3.9.2
+    Versión del codigo 1.0
+    Editor: Geovanny García Downing, 2020092224
+    Entradas: no aplica
+    Salidas: ventana en ciclo TopLevel
+    Restricciones: no aplica
+    Modulos usados: movimiento, obstáculo, básico
+    """
     global meteors
     if entry_text.get()=="":
         msgbox=Toplevel()
@@ -474,6 +516,20 @@ def Vnivel1Check(): #check del box de nombre que no esté vacío y corre nivel 1
         
 
 def Vnivel2Check(): #check del box de nombre que no esté vacío y corre nivel 2
+    """
+    Costa Rica
+    Instituto Tecnológico de Costa Rica
+    Área Académica de Ingeniería en Computadores
+    Taller de Programación, 2021, Grupo 2
+    Milton Villegas Lemus
+    Version Python 3.9.2
+    Versión del codigo 1.0
+    Editor: Geovanny García Downing, 2020092224
+    Entradas: no aplica
+    Salidas: ventana en ciclo TopLevel
+    Restricciones: no aplica
+    Modulos usados: movimiento, obstáculo, básico
+    """
     global meteors
     if entry_text.get()=="":
         msgbox=Toplevel()
@@ -491,6 +547,20 @@ def Vnivel2Check(): #check del box de nombre que no esté vacío y corre nivel 2
             i.obstaculo()
 
 def Vnivel3Check(): #check del box de nombre que no esté vacío y corre nivel 3
+    """
+    Costa Rica
+    Instituto Tecnológico de Costa Rica
+    Área Académica de Ingeniería en Computadores
+    Taller de Programación, 2021, Grupo 2
+    Milton Villegas Lemus
+    Version Python 3.9.2
+    Versión del codigo 1.0
+    Editor: Geovanny García Downing, 2020092224
+    Entradas: no aplica
+    Salidas: ventana en ciclo TopLevel
+    Restricciones: no aplica
+    Modulos usados: movimiento, obstáculo, básico
+    """
     global meteors
     if entry_text.get()=="":
         msgbox=Toplevel()
@@ -663,7 +733,7 @@ def mejores_puntajes():
     Entradas: no aplica
     Salidas: ventana en ciclo TopLevel
     Restricciones: no aplica
-    Modulos usados: back, close, tablero
+    Modulos usados: back, close, tablero1, tablero2, tableroInsertion, tableroQuick
     """
     global puntajes, ventana, about
     ventana.withdraw() #oculta ventana principal
@@ -768,3 +838,22 @@ Btn_info.place(x=300,y=720,anchor="center")
 
 ventana.protocol("WM_DELETE_WINDOW", close)
 ventana.mainloop()
+
+def autodocumentacion():
+    print("Niveles")
+    print(Niveles.__doc__)
+    print("Meteoritos")
+    print(Meteor.__doc__)
+    print("Check Nivel 1")
+    print(Vnivel1Check.__doc__)
+    print("Check Nivel 2")
+    print(Vnivel2Check.__doc__)
+    print("Check Nivel 3")
+    print(Vnivel3Check.__doc__)
+    print("Puntajes")
+    print(mejores_puntajes.__doc__)
+    print("About")
+    print(info_adicional.__doc__)
+
+autodocumentacion()
+
