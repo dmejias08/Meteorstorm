@@ -87,7 +87,7 @@ except:
 leer_archivo(archivo)
 
 ventana=Tk() #Creación de ventana y tamaño
-ventana.title("WARTEC")
+ventana.title("METEORSTORM")
 ventana.minsize(600,800) 
 ventana.resizable(width=NO, height=NO) 
 ##############################################################################################################
@@ -141,7 +141,8 @@ class Niveles: #Inico de clase niveles
     music=""
     fondo=""
     canvas=0
-    def __init__(self,music,fondo,canvas=0):
+
+    def __init__(self,music,fondo,canvas):
         self.music=music
         self.fondo=fondo
         self.canvas=canvas
@@ -151,6 +152,7 @@ class Niveles: #Inico de clase niveles
         FLAG=True
         notdead=True
         sprFlag=True
+        reset_time()
         pts=0
         life=3
         ventana.withdraw() #oculta ventana principal
@@ -221,7 +223,7 @@ class Niveles: #Inico de clase niveles
             nonlocal pts, Label_nombre
             #Verificamos si los segundos y los minutos son mayores a 60
             if s == 60:
-                pause_time(LabelT) #pausa tiempo
+                pause_time(LabelT)
                 msgbox=Toplevel() #mensaje de juego finalizado
                 msgbox.minsize(600,600)
                 L_saludo=Label(msgbox,text="JUEGO\nFINALIZADO\nGanó",font=("Candara Light",30))
@@ -461,7 +463,7 @@ def Vnivel1Check(): #check del box de nombre que no esté vacío y corre nivel 1
         L_saludo=Label(msgbox,text="Debe ingresar un nombre",font=fnt2)
         L_saludo.place(x=100, y=100, anchor="center")
     else:
-        Nivel01=Niveles("assets"+variable+"nivel1.mp3","fondo1.png")
+        Nivel01=Niveles("assets"+variable+"nivel1.mp3","fondo1.png",0)
         Nivel01.basico()
         Nivel01.canvas.meteorito=cargar_img("meteor.png")
         im=Nivel01.canvas.meteorito
@@ -479,7 +481,7 @@ def Vnivel2Check(): #check del box de nombre que no esté vacío y corre nivel 2
         L_saludo=Label(msgbox,text="Debe ingresar un nombre",font=fnt2)
         L_saludo.place(x=100, y=100, anchor="center")
     else:
-        Nivel02=Niveles("assets"+variable+"nivel2.mp3","fondo2.png")
+        Nivel02=Niveles("assets"+variable+"nivel2.mp3","fondo2.png",0)
         Nivel02.basico()
         Nivel02.canvas.meteorito=cargar_img("meteor.png")
         im=Nivel02.canvas.meteorito
@@ -496,7 +498,7 @@ def Vnivel3Check(): #check del box de nombre que no esté vacío y corre nivel 3
         L_saludo=Label(msgbox,text="Debe ingresar un nombre",font=fnt2)
         L_saludo.place(x=100, y=100, anchor="center")
     else:
-        Nivel03=Niveles("assets"+variable+"nivel3.mp3","fondo3.png")
+        Nivel03=Niveles("assets"+variable+"nivel3.mp3","fondo3.png",0)
         Nivel03.basico()
         Nivel03.canvas.meteorito=cargar_img("meteor.png")
         im=Nivel03.canvas.meteorito
@@ -508,7 +510,7 @@ def Vnivel3Check(): #check del box de nombre que no esté vacío y corre nivel 3
 def checkPoints(Pts, Nombre): #guarda el puntaje en la lista
     global puntajes, archivo
     puntajes.append([Nombre,Pts])
-    listaN=insertion(puntajes)
+    listaN=quick(puntajes)
     if len(listaN)>=11:
         listaN=listaN[1:];
     if listaN!=puntajes or len(listaN)<=10:
@@ -517,10 +519,35 @@ def checkPoints(Pts, Nombre): #guarda el puntaje en la lista
         for i in range(1,len(listaN)+1):
             if listaN[-i]==[Nombre,Pts]:
                 pos=i
-        mensajePuntos(Pts,pos)
+        if pos!=0:
+            mensajePuntos(Pts,pos)
     puntajes=listaN
     archivo=open("puntajes.txt","w+") #guarda en archivo
     guardar_archivo(archivo)
+
+def quick(Lista):
+    menores=[]
+    iguales=[]
+    mayores=[]
+    if len(Lista)<=1:
+        return Lista
+    pivote=Lista[-1]
+    partir(Lista,0,len(Lista),pivote,menores,iguales,mayores)
+    ret=quick(menores)
+    ret.extend(iguales)
+    ret.extend(quick(mayores))
+    return ret
+
+def partir(Lista,i,n,Pivote,Menores,Iguales,Mayores):
+    if i==n:
+        return Menores,Iguales,Mayores
+    if Lista[i][1]<Pivote[1]:
+        Menores.append(Lista[i])
+    elif Lista[i][1]>Pivote[1]:
+        Mayores.append(Lista[i])
+    elif Lista[i][1]==Pivote[1]:
+        Iguales.append(Lista[i])
+    return partir(Lista,i+1,n,Pivote,Menores,Iguales,Mayores)
 
 def insertion(Lista):
     return insertion_aux(Lista,1,len(Lista))
@@ -529,12 +556,12 @@ def insertion_aux(Lista,i,n):
     if i==n:
         return Lista
     Aux=Lista[i]
-    j=incluye_orden(Lista,i,Aux[1])
+    j=incluye_orden(Lista,i,Aux[0].lower())
     Lista[j]=Aux
     return insertion_aux(Lista,i+1,n)
 
 def incluye_orden(Lista,j,Aux):
-    if j<=0 or Lista[j-1][1]<=Aux:
+    if j<=0 or Lista[j-1][0]<=Aux:
         return j
     Lista[j]=Lista[j-1]
     return incluye_orden(Lista,j-1,Aux)
@@ -636,7 +663,7 @@ def mejores_puntajes():
     Entradas: no aplica
     Salidas: ventana en ciclo TopLevel
     Restricciones: no aplica
-    Modulos usados: back, close, tablero,
+    Modulos usados: back, close, tablero
     """
     global puntajes, ventana, about
     ventana.withdraw() #oculta ventana principal
@@ -645,12 +672,33 @@ def mejores_puntajes():
     info.minsize(600,800)
     info.resizable(width=NO, height=NO)
     
-    def tablero(Puntajes,I): #retorna un texto con los puntajes, nombres y posiciones
+    def tableroQuick():
+        msgbox=Toplevel() #mensaje de PUNTAJES POR ORDEN NUMÉRICO
+        msgbox.minsize(600,600)
+        L_saludo=Label(msgbox,text=tablero1(puntajes,len(puntajes)-1),font=fnt)
+        L_saludo.place(x=300, y=300, anchor="center")
+
+    def tableroInsertion():
+        msgbox=Toplevel() #mensaje de PUNTAJES POR ORDEN ALFABÉTICO
+        msgbox.minsize(600,600)
+        L_saludo=Label(msgbox,text=tablero2(insertion(puntajes),0),font=fnt)
+        L_saludo.place(x=300, y=300, anchor="center")
+    
+    def tablero1(Puntajes,I): #retorna un texto con los puntajes, nombres y posiciones
         try:
             if I==-1:
                 return ""
             else:
-                return f"{len(Puntajes)-I}. {Puntajes[I][0]} \t\t---> {Puntajes[I][1]}\n" + tablero(Puntajes,I-1)
+                return f"{len(Puntajes)-I}. {Puntajes[I][0]} \t\t---> {Puntajes[I][1]}\n" + tablero1(Puntajes,I-1)
+        except:
+            return ""
+
+    def tablero2(Puntajes,I): #retorna un texto con los puntajes, nombres y posiciones
+        try:
+            if I==len(Puntajes):
+                return ""
+            else:
+                return f"{I+1}. {Puntajes[I][0]} \t\t---> {Puntajes[I][1]}\n" + tablero2(Puntajes,I+1)
         except:
             return ""
 
@@ -680,9 +728,17 @@ def mejores_puntajes():
     Btn_back=Button(info, text='saludar',image=C_app.back, font=fnt, command=back)
     Btn_back.place(x=600,y=0, anchor=NE)
 
+    #Creación botón Quick Sort
+    Btn_quick=Button(info, text='Quick Sort',font=fnt,command=tableroQuick, bg="#002663", fg="#ffffff")
+    Btn_quick.place(x=300,y=270,anchor="center")
+
+    #Creación botón Insertion Sort
+    Btn_insert=Button(info, text='Insertion Sort',font=fnt,command=tableroInsertion, bg="#002663", fg="#ffffff")
+    Btn_insert.place(x=300,y=540,anchor="center")
+
     #Label con el texto de info adicional (about)
-    L_about=Label(info,font=fnt, bg="#ffffff", fg="#000000", text=tablero(puntajes,len(puntajes)-1))
-    L_about.place(x=300, y=380, anchor="center")
+    #L_about=Label(info,font=fnt, bg="#ffffff", fg="#000000", text=tablero(puntajes,len(puntajes)-1))
+    #L_about.place(x=300, y=380, anchor="center")
 
     info.protocol("WM_DELETE_WINDOW",close) 
 
