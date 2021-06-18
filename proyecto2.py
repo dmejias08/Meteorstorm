@@ -10,7 +10,7 @@ Taller de Programación, 2021, Grupo 2
 Milton Villegas Lemus
 Version Python 3.9.2
 Versión del codigo 1.0
-Editor: Geovanny García Downing, 2020092224
+Editores: Geovanny García Downing, 2020092224 y Diana Mejías Hernández, 2020077281
 Entradas: no aplica
 Salidas: ventana en ciclo TK
 Restricciones: no aplica
@@ -103,7 +103,7 @@ class Meteor: #Clase Meteorito
     Milton Villegas Lemus
     Version Python 3.9.2
     Versión del codigo 1.0
-    Editor: Geovanny García Downing, 2020092224
+    Editores: Geovanny García Downing, 2020092224 y Diana Mejías Hernández, 2020077281
     Entradas: no aplica
     Salidas: ventana en ciclo TopLevel
     Restricciones: no aplica
@@ -160,7 +160,7 @@ class Niveles: #Inico de clase niveles
     Milton Villegas Lemus
     Version Python 3.9.2
     Versión del codigo 1.0
-    Editor: Geovanny García Downing, 2020092224
+    Editores: Geovanny García Downing, 2020092224 y Diana Mejías Hernández, 2020077281
     Entradas: no aplica
     Salidas: ventana en ciclo TopLevel
     Restricciones: no aplica
@@ -492,7 +492,7 @@ def Vnivel1Check(): #check del box de nombre que no esté vacío y corre nivel 1
     Milton Villegas Lemus
     Version Python 3.9.2
     Versión del codigo 1.0
-    Editor: Geovanny García Downing, 2020092224
+    Editores: Geovanny García Downing, 2020092224 y Diana Mejías Hernández, 2020077281
     Entradas: no aplica
     Salidas: ventana en ciclo TopLevel
     Restricciones: no aplica
@@ -524,7 +524,7 @@ def Vnivel2Check(): #check del box de nombre que no esté vacío y corre nivel 2
     Milton Villegas Lemus
     Version Python 3.9.2
     Versión del codigo 1.0
-    Editor: Geovanny García Downing, 2020092224
+    Editores: Geovanny García Downing, 2020092224 y Diana Mejías Hernández, 2020077281
     Entradas: no aplica
     Salidas: ventana en ciclo TopLevel
     Restricciones: no aplica
@@ -555,7 +555,7 @@ def Vnivel3Check(): #check del box de nombre que no esté vacío y corre nivel 3
     Milton Villegas Lemus
     Version Python 3.9.2
     Versión del codigo 1.0
-    Editor: Geovanny García Downing, 2020092224
+    Editores: Geovanny García Downing, 2020092224 y Diana Mejías Hernández, 2020077281
     Entradas: no aplica
     Salidas: ventana en ciclo TopLevel
     Restricciones: no aplica
@@ -666,7 +666,7 @@ def info_adicional():
     Milton Villegas Lemus
     Version Python 3.9.2
     Versión del codigo 1.0
-    Editor: Geovanny García Downing, 2020092224
+    Editores: Geovanny García Downing, 2020092224 y Diana Mejías Hernández, 2020077281
     Entradas: no aplica
     Salidas: ventana en ciclo TopLevel
     Restricciones: no aplica
@@ -729,7 +729,7 @@ def mejores_puntajes():
     Milton Villegas Lemus
     Version Python 3.9.2
     Versión del codigo 1.0
-    Editor: Geovanny García Downing, 2020092224
+    Editores: Geovanny García Downing, 2020092224 y Diana Mejías Hernández, 2020077281
     Entradas: no aplica
     Salidas: ventana en ciclo TopLevel
     Restricciones: no aplica
