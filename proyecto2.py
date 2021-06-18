@@ -46,7 +46,7 @@ keyFlag=True
 FLAG=True
 meteors=[]
 
-variable = "\\"
+variable = "/"
 
 #Texto de la  ventana de información adicional
 about="""
