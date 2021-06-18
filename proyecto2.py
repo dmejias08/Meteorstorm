@@ -46,7 +46,7 @@ keyFlag=True
 FLAG=True
 meteors=[]
 
-variable = "/"
+variable = "\\"
 
 #Texto de la  ventana de información adicional
 about="""
@@ -631,7 +631,7 @@ def insertion_aux(Lista,i,n):
     return insertion_aux(Lista,i+1,n)
 
 def incluye_orden(Lista,j,Aux):
-    if j<=0 or Lista[j-1][0]<=Aux:
+    if j<=0 or Lista[j-1][0].lower()<=Aux:
         return j
     Lista[j]=Lista[j-1]
     return incluye_orden(Lista,j-1,Aux)
